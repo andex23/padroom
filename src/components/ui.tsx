@@ -1,0 +1,10 @@
+import Link from 'next/link';
+import { ActionForm } from './action-form';
+export function Field({label,name,type='text',required=true,defaultValue='',maxLength}:{label:string;name:string;type?:string;required?:boolean;defaultValue?:string;maxLength?:number}){return <label>{label}<input name={name} type={type} required={required} defaultValue={defaultValue} maxLength={maxLength}/></label>;}
+export function Select({label,name,values,defaultValue,empty}:{label:string;name:string;values:readonly string[];defaultValue?:string;empty?:string}){return <label>{label}<select name={name} defaultValue={defaultValue}>{empty&&<option value="">{empty}</option>}{values.map(value=><option key={value}>{value}</option>)}</select></label>;}
+export function Textarea({label,name,defaultValue='',maxLength=2000,minLength=1}:{label:string;name:string;defaultValue?:string;maxLength?:number;minLength?:number}){return <label>{label}<textarea name={name} required defaultValue={defaultValue} maxLength={maxLength} minLength={minLength} rows={4}/></label>;}
+export function Mutation({command,id,state,label}:{command:string;id:string;state?:string;label:string}){return <ActionForm command={command} fields={{id,...(state?{state}:{})}}><button className="secondary">{label}</button></ActionForm>;}
+export function Empty({title,children}:{title:string;children:React.ReactNode}){return <section className="empty"><h2>{title}</h2><div>{children}</div></section>;}
+export function SetupNotice(){return <Empty title="Connect the marketplace database"><p>Supabase has not been configured. Follow the setup instructions in README.md to enable accounts and inventory.</p><Link href="/how-it-works">How PADROOM works</Link></Empty>;}
+export function Notice({params}:{params:Record<string,string|undefined>}){return params.error?<p role="alert" className="error">{params.error}</p>:null;}
+export const PilotNote=()=> <p className="pilot">Payments and delivery are arranged separately during the pilot. PADROOM does not currently hold funds or guarantee transactions.</p>;

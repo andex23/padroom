@@ -1,0 +1,42 @@
+{
+  "name": "padroom",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --hostname 0.0.0.0",
+    "build": "next build",
+    "start": "next start --hostname 0.0.0.0",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "test:db": "node tests/database.mjs",
+    "setup:local": "bash scripts/install-supabase.sh",
+    "db:start": "supabase_cmd=.tools/supabase; SUPABASE_INTERNAL_IMAGE_REGISTRY=docker.io \"$supabase_cmd\" start -x studio,imgproxy,edge-runtime,logflare,vector,supavisor",
+    "db:stop": ".tools/supabase stop",
+    "db:reset": ".tools/supabase db reset --local"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.117.3",
+    "next": "^16.4.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "sharp": "^0.35.5",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.0",
+    "@types/node": "^26.6.4",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.4.0",
+    "typescript": "^6.0.3",
+    "vitest": "^5.0.3"
+  },
+  "type": "module"
+}
