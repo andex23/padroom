@@ -44,7 +44,7 @@ export function Select({
   return (
     <label>
       {label}
-      <select name={name} defaultValue={defaultValue}>
+      <select name={name} aria-label={label} defaultValue={defaultValue}>
         {empty && <option value="">{empty}</option>}
         {values.map((value) => (
           <option key={value}>{value}</option>

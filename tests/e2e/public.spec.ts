@@ -54,3 +54,65 @@ test("cross-origin mutations are rejected", async ({ request }) => {
   });
   expect(response.status()).toBe(403);
 });
+
+test("filters, search and immediate sorting preserve the selected inventory query", async ({
+  page,
+}) => {
+  await page.goto("/?category=Consoles");
+  const toggle = page.getByRole("button", { name: "Filters & sort" });
+  if (await toggle.isVisible()) await toggle.click();
+  await page.getByLabel("Location", { exact: true }).selectOption("Lagos");
+  await page.getByLabel("Minimum price (₦)", { exact: true }).fill("1000");
+  await page.getByRole("button", { name: "Apply filters" }).click();
+  await expect(page).toHaveURL(/city=Lagos/);
+  await expect(page).toHaveURL(/category=Consoles/);
+  await page.getByRole("searchbox").fill("PlayStation");
+  await page.getByRole("button", { name: "Search", exact: true }).click();
+  await expect(page).toHaveURL(/q=PlayStation/);
+  await expect(page).toHaveURL(/city=Lagos/);
+  await expect(page).toHaveURL(/min=1000/);
+  await page
+    .getByLabel("Sort by", { exact: true })
+    .selectOption("Price: low to high");
+  await expect
+    .poll(() => new URL(page.url()).searchParams.get("sort"))
+    .toBe("Price: low to high");
+  await expect(page).toHaveURL(/q=PlayStation/);
+  await page
+    .getByRole("navigation", { name: "Categories" })
+    .getByRole("link", { name: "Controllers", exact: true })
+    .click();
+  await expect(page).toHaveURL(/category=Controllers/);
+  await expect(page).toHaveURL(/city=Lagos/);
+  await page
+    .getByRole("link", { name: "Remove Lagos filter", exact: true })
+    .click();
+  await expect
+    .poll(() => new URL(page.url()).searchParams.get("city"))
+    .toBeNull();
+  await expect(page).toHaveURL(/category=Controllers/);
+});
+
+test("the catalogue and account shell fit every required viewport", async ({
+  page,
+}) => {
+  for (const width of [375, 430, 768, 1280, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    await expect(page.getByRole("searchbox")).toBeVisible();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    await page.goto("/sign-in");
+    await expect(
+      page.getByRole("heading", { name: "Sign in", exact: true }),
+    ).toBeVisible();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+  }
+});

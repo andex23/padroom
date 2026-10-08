@@ -136,7 +136,11 @@ test("real seller → moderation → buyer workflow", async ({ browser }) => {
     await buyer.goto("/");
     await buyer.getByRole("searchbox").fill(title);
     await buyer.getByRole("button", { name: "Search", exact: true }).click();
-    await buyer.getByRole("link", { name: new RegExp(title) }).click();
+    await buyer
+      .getByRole("article")
+      .filter({ has: buyer.getByRole("heading", { name: title, exact: true }) })
+      .getByRole("link")
+      .click();
     await expect(buyer.getByRole("heading", { name: title })).toBeVisible();
     await buyer.getByRole("button", { name: "Save equipment" }).click();
     await expect(

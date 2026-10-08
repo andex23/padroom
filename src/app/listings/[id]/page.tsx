@@ -43,7 +43,13 @@ export default async function Detail({
     : { data: [] };
   return (
     <>
-      <Link href="/">← Browse</Link>
+      <nav className="detail-breadcrumb" aria-label="Breadcrumb">
+        <Link href="/">Browse</Link>
+        <span>/</span>
+        <Link href={`/?category=${l.category}`}>{l.category}</Link>
+        <span>/</span>
+        <span>{l.id.slice(0, 8).toUpperCase()}</span>
+      </nav>
       <div className="detail" style={{ marginTop: 24 }}>
         <div className="gallery">
           {images.length ? (
@@ -65,7 +71,7 @@ export default async function Detail({
             <p className="meta">No photos added yet</p>
           )}
         </div>
-        <section>
+        <section className="detail-summary">
           <p className="meta">
             {l.category.toUpperCase()} / {l.city.toUpperCase()}
           </p>
@@ -80,26 +86,6 @@ export default async function Detail({
           {l.status !== "active" && (
             <p className="meta">{l.status.replaceAll("_", " ")}</p>
           )}
-          <dl>
-            {[
-              ["Seller", name || "Seller"],
-              [
-                "Brand / model",
-                [l.brand, l.model].filter(Boolean).join(" / ") ||
-                  "Not specified",
-              ],
-              ["Condition", l.condition],
-              ["Known defects", l.defects],
-              ["Included", l.included_items],
-            ].map(([label, value]) => (
-              <div className="fact" key={label}>
-                <dt>{label}</dt>
-                <dd>{value}</dd>
-              </div>
-            ))}
-          </dl>
-          <h2>Description</h2>
-          <p className="plain-text">{l.description}</p>
           {owner ? (
             <Link className="button" href={`/sell/${id}/edit`}>
               Manage your listing
@@ -112,18 +98,7 @@ export default async function Detail({
                   id={id}
                   label={saved ? "Remove from saved" : "Save equipment"}
                 />
-                <details>
-                  <summary>Message seller</summary>
-                  <ActionForm
-                    command="conversation"
-                    fields={{ id }}
-                    className="stack-form"
-                  >
-                    <Textarea label="Your message" name="body" />
-                    <button>Send message</button>
-                  </ActionForm>
-                </details>
-                <details>
+                <details className="purchase-action">
                   <summary>Request to buy</summary>
                   <ActionForm
                     command="offer"
@@ -135,6 +110,17 @@ export default async function Detail({
                       <textarea name="note" maxLength={2000} rows={3} />
                     </label>
                     <button>Send purchase request</button>
+                  </ActionForm>
+                </details>
+                <details className="contact-action">
+                  <summary>Message seller</summary>
+                  <ActionForm
+                    command="conversation"
+                    fields={{ id }}
+                    className="stack-form"
+                  >
+                    <Textarea label="Your message" name="body" />
+                    <button>Send message</button>
                   </ActionForm>
                 </details>
                 <details>
@@ -200,6 +186,26 @@ export default async function Detail({
               </Link>
             )
           ) : null}
+          <dl>
+            {[
+              ["Seller", name || "Seller"],
+              [
+                "Brand / model",
+                [l.brand, l.model].filter(Boolean).join(" / ") ||
+                  "Not specified",
+              ],
+              ["Condition", l.condition],
+              ["Known defects", l.defects],
+              ["Included", l.included_items],
+            ].map(([label, value]) => (
+              <div className="fact" key={label}>
+                <dt>{label}</dt>
+                <dd>{value}</dd>
+              </div>
+            ))}
+          </dl>
+          <h2>Description</h2>
+          <p className="plain-text">{l.description}</p>
           <PilotNote />
         </section>
       </div>

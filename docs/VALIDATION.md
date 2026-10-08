@@ -9,7 +9,7 @@ Verified in the current cloud instance using Node.js 24.19.0, Next.js 16.4.0, ge
 | Vitest | 26 passed across 2 files |
 | Production build | Passed, 22 application routes plus Next proxy |
 | Real Supabase integration | 74 assertions passed |
-| Playwright | 9 passed; 1 deliberate skip of the duplicate mobile multi-account transaction |
+| Playwright | 13 passed; 1 deliberate skip of the duplicate mobile multi-account transaction |
 | Initial fresh database migration | Applied successfully by local Supabase startup |
 | Fixture cleanup | Verified zero listings, auth accounts and stored objects remain |
 
@@ -23,7 +23,9 @@ Actual byte-level tests rejected HTML/SVG mislabeled as JPEG, excessive pixel di
 
 ## Visual QA
 
-Inspected browser screenshots at 375×812 and 1280×900. Paper Mono loaded successfully. Monochrome bone/ink surfaces, lowercase wordmark, restrained heading hierarchy, compact navigation, visible search/categories, labeled filters and honest empty states match the supplied brand brief. Mobile filters collapse to keep inventory/empty state in the first viewport; persistent mobile navigation retains text labels. Neither viewport overflowed horizontally. Product photography comes from uploaded seller files, not a bundled sample catalog. Font licensing/provenance is retained in `public/fonts`.
+The revised shared shell and catalogue were checked at 375px, 430px, 768px, 1280px and 1440px. Browse and account screens fit without horizontal overflow. Inspected actual desktop/mobile screenshots, including collapsed mobile filters. The interface now uses self-hosted Geist Sans for reading and Paper Mono for navigation, controls and metadata. Header search, grouped filters, active-filter removal, immediate sorting, square photo cards, seller steps and listing actions use the same monochrome design system. The empty catalogue explains the real listing/review/contact flow without invented inventory. See `DESIGN-REVISION.md` for the current changes.
+
+Search retains selected filters; category changes retain the rest of the query; sorting submits immediately on desktop and mobile. Current-page navigation is visible in account and mobile workspaces. Both font licenses/provenance are retained in `public/fonts`.
 
 Native resized images deliberately avoid the Next image optimizer for short-lived private signed URLs. Image failures have visible fallbacks. The framework-generated Next.js guidance block in AGENTS.md was retained; the relevant bundled cookie/proxy documentation was read.
 

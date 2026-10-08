@@ -7,6 +7,7 @@ import { listingSelect, photos, fail } from "@/lib/catalog";
 import { ListingEditor } from "@/components/listing-editor";
 import { ActionForm } from "@/components/action-form";
 import { Mutation } from "@/components/ui";
+import { SellProgress } from "@/components/sell-progress";
 export default async function Edit({
   params,
 }: {
@@ -34,15 +35,20 @@ export default async function Edit({
           {l.status.replaceAll("_", " ")}
           {l.review_reason && ` / ${l.review_reason}`}
         </p>
-        {["draft", "rejected", "active"].includes(l.status) ? (
-          <ListingEditor listing={l} />
-        ) : (
-          <p>
-            Withdraw from review to edit. Sold and archived listings are
-            retained as records.
-          </p>
-        )}
-        <h2 className="form-section">02 / Photos</h2>
+        <SellProgress saved photos={images.length > 0} />
+        <div id="listing-details">
+          {["draft", "rejected", "active"].includes(l.status) ? (
+            <ListingEditor listing={l} />
+          ) : (
+            <p>
+              Withdraw from review to edit. Sold and archived listings are
+              retained as records.
+            </p>
+          )}
+        </div>
+        <h2 className="form-section" id="listing-photos">
+          02 / Photos
+        </h2>
         <p className="meta">
           1–8 photos. JPEG, PNG or WebP, up to 5 MB each. Photos are resized and
           metadata removed.
@@ -84,7 +90,9 @@ export default async function Edit({
             <button>Upload photo</button>
           </ActionForm>
         )}
-        <h2 className="form-section">03 / Preview & submit</h2>
+        <h2 className="form-section" id="listing-review">
+          03 / Preview & submit
+        </h2>
         <p>
           Check your item, condition, price and photos before sending it to
           moderation.

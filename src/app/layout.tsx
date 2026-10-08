@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
+import { GeistSans } from "geist/font/sans";
+import { CatalogSearch } from "@/components/catalog-search";
+import { NavLink } from "@/components/nav-link";
+import { Icon } from "@/components/icon";
 import { viewer } from "@/lib/supabase";
-import { ActionForm } from "@/components/action-form";
 import "./globals.css";
 export const metadata: Metadata = {
   title: {
@@ -19,7 +23,7 @@ export default async function Layout({
 }) {
   const user = await viewer();
   return (
-    <html lang="en-NG">
+    <html lang="en-NG" className={GeistSans.variable}>
       <body>
         <a className="skip" href="#main">
           Skip to content
@@ -30,7 +34,7 @@ export default async function Layout({
               padroom.
             </Link>
             <nav className="desktop-nav" aria-label="Main navigation">
-              <Link href="/">Browse</Link>
+              <NavLink href="/" label="Browse" />
               <Link className="category-nav" href="/?category=Consoles">
                 Consoles
               </Link>
@@ -40,27 +44,39 @@ export default async function Layout({
               <Link className="category-nav" href="/?category=Accessories">
                 Accessories
               </Link>
-              <Link href="/sell/new">Sell</Link>
             </nav>
+            <Suspense>
+              <CatalogSearch />
+            </Suspense>
             <nav className="account-nav" aria-label="Account navigation">
-              <Link href="/saved">Saved</Link>
-              <Link href="/messages">Messages</Link>
-              <Link href={user ? "/account" : "/sign-in"}>
-                {user ? "Account" : "Sign in"}
-              </Link>
-              {user && (
-                <ActionForm command="sign-out">
-                  <button className="secondary">Sign out</button>
-                </ActionForm>
-              )}
+              <NavLink href="/saved" label="Saved" icon="bookmark" />
+              <NavLink href="/messages" label="Messages" icon="message" />
+              <NavLink
+                href={user ? "/account" : "/sign-in"}
+                label={user ? "Account" : "Sign in"}
+                icon="account"
+              />
             </nav>
+            <Link className="button header-sell" href="/sell/new">
+              <Icon name="plus" />
+              Sell
+            </Link>
           </div>
         </header>
         <main id="main" className="container">
           {children}
         </main>
         <footer className="footer">
-          <span>padroom. / Independent gaming commerce, Nigeria.</span>
+          <div className="footer-identity">
+            <Link href="/" className="wordmark">
+              padroom.
+            </Link>
+            <span>
+              Independent gaming commerce.
+              <br />
+              Nigeria / NGN
+            </span>
+          </div>
           <nav aria-label="Help">
             <Link href="/how-it-works">How it works</Link>
             <Link href="/safety">Safety</Link>
@@ -69,11 +85,11 @@ export default async function Layout({
           </nav>
         </footer>
         <nav className="mobile-nav" aria-label="Mobile navigation">
-          <Link href="/">Browse</Link>
-          <Link href="/saved">Saved</Link>
-          <Link href="/sell/new">Sell</Link>
-          <Link href="/messages">Inbox</Link>
-          <Link href="/account">Account</Link>
+          <NavLink href="/" label="Browse" icon="browse" />
+          <NavLink href="/saved" label="Saved" icon="bookmark" />
+          <NavLink href="/sell/new" label="Sell" icon="plus" />
+          <NavLink href="/messages" label="Inbox" icon="message" />
+          <NavLink href="/account" label="Account" icon="account" />
         </nav>
       </body>
     </html>

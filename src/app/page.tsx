@@ -5,6 +5,8 @@ import { categories, cities, conditions, Listing, toKobo } from "@/lib/domain";
 import { listingSelect, fail } from "@/lib/catalog";
 import { ListingCard } from "@/components/listing-card";
 import { Empty, Select, SetupNotice } from "@/components/ui";
+import { Icon } from "@/components/icon";
+import { CatalogSort } from "@/components/catalog-sort";
 type Params = Record<string, string | undefined>;
 export default async function Browse({
   searchParams,
@@ -70,45 +72,55 @@ export default async function Browse({
     q.set("page", String(n));
     return `/?${q}`;
   };
+  const filterKeys = [
+    "q",
+    "category",
+    "city",
+    "condition",
+    "brand",
+    "min",
+    "max",
+  ];
+  const activeFilters = filterKeys.filter((key) => p[key]);
+  const filtered = activeFilters.length > 0;
+  const changeFilter = (key: string, value?: string) => {
+    const params = new URLSearchParams(
+      Object.entries(p).filter(
+        (entry): entry is [string, string] => !!entry[1],
+      ),
+    );
+    params.delete("page");
+    if (value) params.set(key, value);
+    else params.delete(key);
+    return params.size ? `/?${params}` : "/";
+  };
+  const filterLabel = (key: string) =>
+    key === "min"
+      ? `From ₦${p[key]}`
+      : key === "max"
+        ? `Up to ₦${p[key]}`
+        : key === "q"
+          ? `Search: ${p[key]}`
+          : p[key];
   return (
-    <>
-      <form action="/" className="searchbar">
-        <label
-          className="sr-only"
-          htmlFor="search"
-          style={{
-            position: "absolute",
-            width: 1,
-            height: 1,
-            overflow: "hidden",
-          }}
-        >
-          Search equipment
-        </label>
-        <input
-          id="search"
-          name="q"
-          type="search"
-          placeholder="Search consoles, games, equipment…"
-          defaultValue={p.q}
-          maxLength={120}
-        />
-        <button>Search</button>
-      </form>
+    <div className="browse-page">
       <div className="browse-heading">
-        <h1>Browse</h1>
-        <span className="meta">
-          {configured()
-            ? `${count} ${count === 1 ? "listing" : "listings"}`
-            : "Nigeria / Independent marketplace"}
-        </span>
+        <div>
+          <p className="eyebrow">Marketplace / Nigeria</p>
+          <h1>Browse</h1>
+        </div>
+        <p className="browse-intro">
+          Consoles, games and equipment.
+          <br />
+          <span>Previously played. Ready again.</span>
+        </p>
       </div>
       <nav className="tabs" aria-label="Categories">
         {["All", ...categories].map((c) => (
           <Link
             key={c}
             aria-current={(p.category || "All") === c ? "page" : undefined}
-            href={c === "All" ? "/" : `/?category=${c}`}
+            href={changeFilter("category", c === "All" ? undefined : c)}
           >
             {c}
           </Link>
@@ -116,67 +128,103 @@ export default async function Browse({
       </nav>
       <div className="catalog">
         <FilterPanel>
-          <form action="/">
+          <form action="/" id="catalog-filters">
             <input type="hidden" name="q" value={p.q || ""} />
-            <Select
-              label="Category"
-              name="category"
-              values={categories}
-              defaultValue={p.category || ""}
-              empty="All categories"
-            />
-            <Select
-              label="City"
-              name="city"
-              values={cities}
-              defaultValue={p.city || ""}
-              empty="All cities"
-            />
-            <Select
-              label="Condition"
-              name="condition"
-              values={conditions}
-              defaultValue={p.condition || ""}
-              empty="Any condition"
-            />
-            <label>
-              Brand
-              <input
-                name="brand"
-                defaultValue={p.brand}
-                maxLength={60}
-                placeholder="Any brand"
+            <input type="hidden" name="category" value={p.category || ""} />
+            <fieldset className="filter-group">
+              <legend>Price range / NGN</legend>
+              <div className="price-inputs">
+                <label>
+                  <span className="sr-only">Minimum price (₦)</span>
+                  <input
+                    name="min"
+                    inputMode="decimal"
+                    defaultValue={p.min}
+                    placeholder="Min"
+                  />
+                </label>
+                <span aria-hidden="true">—</span>
+                <label>
+                  <span className="sr-only">Maximum price (₦)</span>
+                  <input
+                    name="max"
+                    inputMode="decimal"
+                    defaultValue={p.max}
+                    placeholder="Max"
+                  />
+                </label>
+              </div>
+            </fieldset>
+            <div className="filter-group">
+              <Select
+                label="Location"
+                name="city"
+                values={cities}
+                defaultValue={p.city || ""}
+                empty="All cities"
               />
-            </label>
-            <label>
-              Minimum price (₦)
-              <input
-                name="min"
-                inputMode="decimal"
-                defaultValue={p.min}
-                placeholder="1"
+            </div>
+            <div className="filter-group">
+              <Select
+                label="Condition"
+                name="condition"
+                values={conditions}
+                defaultValue={p.condition || ""}
+                empty="Any condition"
               />
-            </label>
-            <label>
-              Maximum price (₦)
-              <input
-                name="max"
-                inputMode="decimal"
-                defaultValue={p.max}
-                placeholder="50,000,000"
-              />
-            </label>
-            <Select
-              label="Sort"
-              name="sort"
-              values={["Newest", "Price: low to high", "Price: high to low"]}
-              defaultValue={p.sort || "Newest"}
-            />
-            <button>Apply filters</button>
-            <Link href="/">Clear filters</Link>
+            </div>
+            <div className="filter-group">
+              <label>
+                Brand / device
+                <input
+                  name="brand"
+                  defaultValue={p.brand}
+                  maxLength={60}
+                  placeholder="e.g. Sony, Nintendo"
+                />
+              </label>
+            </div>
+            <button className="filter-apply">
+              Apply filters
+              <Icon name="arrow" />
+            </button>
+            <Link className="filter-reset" href="/">
+              Clear filters
+            </Link>
           </form>
+          <div className="filter-help">
+            <p className="meta">Buying for the first time?</p>
+            <Link href="/safety">
+              Read the safety guide
+              <Icon name="arrow" />
+            </Link>
+          </div>
         </FilterPanel>
-        <section aria-label="Listings">
+        <section className="catalog-results" aria-label="Listings">
+          <div className="inventory-toolbar">
+            <p className="meta">
+              <span className="inventory-count">
+                {count.toString().padStart(2, "0")}
+              </span>{" "}
+              {count === 1 ? "listing" : "listings"}
+              {filtered ? " found" : " available"}
+            </p>
+            <CatalogSort value={p.sort || "Newest"} />
+          </div>
+          {filtered && (
+            <div className="active-filters" aria-label="Active filters">
+              {activeFilters.map((key) => (
+                <Link
+                  key={key}
+                  href={changeFilter(key)}
+                  aria-label={`Remove ${filterLabel(key)} filter`}
+                >
+                  {filterLabel(key)}
+                  <Icon name="close" />
+                </Link>
+              ))}
+            </div>
+          )}
           {priceError && (
             <p role="alert" className="error">
               {priceError}
@@ -190,39 +238,87 @@ export default async function Browse({
                 <ListingCard key={l.id} listing={l} />
               ))}
             </div>
-          ) : (
-            <Empty
-              title={
-                p.q ||
-                p.category ||
-                p.city ||
-                p.condition ||
-                p.brand ||
-                p.min ||
-                p.max
-                  ? "No matching listings"
-                  : "Nothing listed yet"
-              }
-            >
+          ) : filtered ? (
+            <Empty title="No matching listings">
               <p>
-                {Object.values(p).some(Boolean)
-                  ? "Try a different search or clear your filters."
-                  : "Good things deserve another round. Be the first to list your gaming equipment."}
+                Try another city, adjust your price range or clear your filters.
               </p>
-              <div className="actions">
-                <Link className="button" href="/sell/new">
-                  Create a listing
-                </Link>
-                <Link href="/">Clear filters</Link>
-              </div>
+              <Link className="button secondary" href="/">
+                Clear filters
+                <Icon name="arrow" />
+              </Link>
             </Empty>
+          ) : (
+            <section className="catalog-empty" aria-labelledby="empty-title">
+              <div className="empty-content">
+                <div className="empty-primary">
+                  <p className="eyebrow">Open for your first listing</p>
+                  <h2 id="empty-title">Nothing listed yet</h2>
+                  <p>
+                    Have equipment you no longer play?
+                    <br />
+                    Give it another round.
+                  </p>
+                  <Link className="button" href="/sell/new">
+                    Create a listing
+                    <Icon name="arrow" />
+                  </Link>
+                  <Link className="empty-guide" href="/how-it-works">
+                    How selling works
+                  </Link>
+                </div>
+                <ol
+                  className="empty-steps"
+                  aria-label="How to list your equipment"
+                >
+                  <li>
+                    <span className="step-number">01</span>
+                    <div>
+                      <h3>List what you have</h3>
+                      <p>Add the details, price and your own photos.</p>
+                    </div>
+                  </li>
+                  <li>
+                    <span className="step-number">02</span>
+                    <div>
+                      <h3>We review your listing</h3>
+                      <p>Approved equipment appears in the marketplace.</p>
+                    </div>
+                  </li>
+                  <li>
+                    <span className="step-number">03</span>
+                    <div>
+                      <h3>Speak with a buyer</h3>
+                      <p>Arrange payment and handover directly.</p>
+                    </div>
+                  </li>
+                </ol>
+              </div>
+              <div className="empty-foot">
+                <span>Consoles / Controllers / Games / Accessories</span>
+                <Link href="/safety">
+                  Trade carefully
+                  <Icon name="arrow" />
+                </Link>
+              </div>
+            </section>
           )}
-          <nav className="pagination" aria-label="Pages">
-            {page > 1 && <Link href={url(page - 1)}>Previous</Link>}
-            {count > page * 24 && <Link href={url(page + 1)}>Next</Link>}
-          </nav>
+          {(page > 1 || count > page * 24) && (
+            <nav className="pagination" aria-label="Pages">
+              {page > 1 && <Link href={url(page - 1)}>Previous</Link>}
+              <span className="meta">Page {page}</span>
+              {count > page * 24 && <Link href={url(page + 1)}>Next</Link>}
+            </nav>
+          )}
+          <p className="catalog-note">
+            Good things deserve another round.
+            <Link href="/sell/new">
+              Sell your equipment
+              <Icon name="arrow" />
+            </Link>
+          </p>
         </section>
       </div>
-    </>
+    </div>
   );
 }
