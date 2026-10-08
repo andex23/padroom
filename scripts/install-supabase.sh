@@ -18,5 +18,7 @@ actual = hashlib.sha256((root/name).read_bytes()).hexdigest()
 if actual != expected: raise SystemExit('Supabase artifact checksum verification failed')
 PY
 mkdir -p .tools
-tar -xzf "$temp_dir/$archive" -C .tools supabase
+tar -xzf "$temp_dir/$archive" -C "$temp_dir" supabase
+install -m 755 "$temp_dir/supabase" .tools/supabase.new
+mv .tools/supabase.new .tools/supabase
 .tools/supabase --version

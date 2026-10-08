@@ -128,8 +128,8 @@ create function public.moderate_listing(p_id uuid,p_state text,p_reason text) re
  if p_state='active' and (not exists(select 1 from public.listing_images where listing_id=p_id) or exists(select 1 from public.profiles where id=l.seller_id and suspended_at is not null)) then raise exception 'Listing is not publishable'; end if;
  elsif p_state='archived' and l.status='active' then null;
  else raise exception 'Invalid moderation transition'; end if;
- if p_state<>'active' and char_length(trim(p_reason)) not between 5 and 1000 then raise exception 'Provide a reason (5–1000 characters)'; end if;
- update public.listings set status=p_state,review_reason=left(p_reason,1000),published_at=case when p_state='active' then now() else null end,updated_at=now() where id=p_id;
+ if p_state<>'active' and coalesce(char_length(trim(p_reason)),0) not between 5 and 1000 then raise exception 'Provide a reason (5–1000 characters)'; end if;
+ update public.listings set status=p_state,review_reason=case when p_state='active' then null else left(p_reason,1000) end,published_at=case when p_state='active' then now() else null end,updated_at=now() where id=p_id;
  if p_state='archived' then update public.offers set status='cancelled',updated_at=now() where (listing_id=p_id or offered_listing_id=p_id) and status in ('pending','accepted'); end if;
  insert into public.moderation_events(admin_id,entity_id,action,notes) values(auth.uid(),p_id,p_state,left(p_reason,1000)); end$$;
 create function public.toggle_save(p_listing uuid) returns void language plpgsql security definer set search_path='' as $$declare u uuid:=public.active_user(); begin
@@ -187,7 +187,7 @@ create function public.resolve_report(p_id uuid) returns void language plpgsql s
  insert into public.moderation_events(admin_id,entity_id,action) values(auth.uid(),p_id,'resolve_report'); end$$;
 create function public.suspend_account(p_user uuid,p_suspend boolean,p_reason text) returns void language plpgsql security definer set search_path='' as $$begin
  if not public.is_admin() or p_user=auth.uid() then raise exception 'Administrator access required; cannot suspend yourself'; end if;
- if char_length(trim(p_reason)) not between 5 and 1000 then raise exception 'Provide a reason (5–1000 characters)'; end if;
+ if coalesce(char_length(trim(p_reason)),0) not between 5 and 1000 then raise exception 'Provide a reason (5–1000 characters)'; end if;
  -- Serialize with listing and offer writes.
  perform 1 from public.listings where seller_id=p_user order by id for update;
  update public.profiles set suspended_at=case when p_suspend then now() else null end where id=p_user;

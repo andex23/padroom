@@ -8,7 +8,9 @@ export default async function Offers() {
   const { user, db } = await authenticated();
   const { data, error } = await db
     .from("offers")
-    .select("*")
+    .select(
+      "*,item:listings!offers_listing_id_fkey(title),trade_item:listings!offers_offered_listing_id_fkey(title)",
+    )
     .order("created_at", { ascending: false });
   fail(error);
   return (
@@ -35,14 +37,15 @@ export default async function Offers() {
             </p>
             <p>
               <Link href={`/listings/${o.listing_id}`}>
-                Requested equipment
+                {o.item?.title || "Requested equipment (no longer public)"}
               </Link>
               {o.offered_listing_id && (
                 <>
                   {" "}
                   /{" "}
                   <Link href={`/listings/${o.offered_listing_id}`}>
-                    Offered equipment
+                    {o.trade_item?.title ||
+                      "Offered equipment (no longer public)"}
                   </Link>
                 </>
               )}

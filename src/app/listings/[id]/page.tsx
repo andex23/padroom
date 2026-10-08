@@ -52,6 +52,7 @@ export default async function Detail({
                 <Photo
                   key={i.id}
                   src={i.url}
+                  loading={i.position === 0 ? "eager" : "lazy"}
                   alt={`${l.title} — photo ${i.position + 1}`}
                 />
               ) : (

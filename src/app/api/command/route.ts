@@ -9,7 +9,7 @@ import {
   uuid,
 } from "@/lib/domain";
 import { z } from "zod";
-import sharp from "sharp";
+import { normalizePhoto } from "@/lib/image";
 export const runtime = "nodejs";
 const text = (f: FormData, n: string) => String(f.get(n) ?? "");
 async function boundedForm(request: NextRequest) {
@@ -59,7 +59,16 @@ export async function POST(request: NextRequest) {
     };
     let redirect: string | undefined;
     let message = "Saved.";
-    if (command === "sign-in" || command === "sign-up") {
+    if (command === "password-reset") {
+      const email = z.string().email().max(254).parse(text(f, "email"));
+      const { error } = await db.auth.resetPasswordForEmail(email, {
+        redirectTo: `${new URL(expected).origin}/auth/callback?next=/reset-password`,
+      });
+      if (error)
+        throw new Error("Unable to send reset email. Try again later.");
+      message =
+        "If this email has an account, a password reset link has been sent.";
+    } else if (command === "sign-in" || command === "sign-up") {
       const email = z.string().email().max(254).parse(text(f, "email"));
       const password = z.string().min(10).max(128).parse(text(f, "password"));
       if (command === "sign-in") {
@@ -107,6 +116,20 @@ export async function POST(request: NextRequest) {
         );
       const id = (field = "id") => uuid.parse(text(f, field));
       switch (command) {
+        case "password-update": {
+          const password = z
+            .string()
+            .min(10)
+            .max(128)
+            .parse(text(f, "password"));
+          const { error } = await db.auth.updateUser({ password });
+          if (error)
+            throw new Error(
+              "Unable to update password. Request a new reset link.",
+            );
+          redirect = "/account";
+          break;
+        }
         case "sign-out": {
           const { error } = await db.auth.signOut();
           if (error) throw error;
@@ -161,23 +184,10 @@ export async function POST(request: NextRequest) {
             .single();
           if (error || l.seller_id !== user.id || l.status !== "draft")
             throw new Error("Only your drafts can receive photos.");
-          const image = sharp(Buffer.from(await file.arrayBuffer()), {
-            limitInputPixels: 25_000_000,
-            animated: false,
-          });
-          const metadata = await image.metadata();
-          if (!["jpeg", "png", "webp"].includes(metadata.format ?? ""))
-            throw new Error("Invalid photo content.");
-          const bytes = await image
-            .rotate()
-            .resize({
-              width: 1600,
-              height: 1600,
-              fit: "inside",
-              withoutEnlargement: true,
-            })
-            .jpeg({ quality: 85 })
-            .toBuffer();
+          const bytes = await normalizePhoto(
+            new Uint8Array(await file.arrayBuffer()),
+            file.type,
+          );
           const path = `${user.id}/${listing}/${crypto.randomUUID()}.jpg`;
           const { error: uploadError } = await db.storage
             .from("listing-photos")
@@ -279,7 +289,9 @@ export async function POST(request: NextRequest) {
         case "suspend":
           await rpc("suspend_account", {
             p_user: id(),
-            p_suspend: text(f, "state") === "suspend",
+            p_suspend:
+              z.enum(["suspend", "restore"]).parse(text(f, "state")) ===
+              "suspend",
             p_reason: z
               .string()
               .trim()

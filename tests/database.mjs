@@ -7,7 +7,7 @@ import sharp from "sharp";
 for (const line of readFileSync(".env.local", "utf8").split("\n")) {
   const i = line.indexOf("=");
   if (i > 0 && !line.startsWith("#"))
-    process.env[line.slice(0, i)] = line.slice(i + 1).replace(/^"|"$/g, "");
+    process.env[line.slice(0, i)] ??= line.slice(i + 1).replace(/^"|"$/g, "");
 }
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
@@ -171,6 +171,18 @@ try {
     "draft photo private",
   );
   await publish(seller, listing);
+  await denied(
+    await seller.from("admin_members").insert({ user_id: ids[0] }),
+    "admin self-promotion denied",
+  );
+  await denied(
+    await buyer.rpc("moderate_listing", {
+      p_id: listing,
+      p_state: "archived",
+      p_reason: "Malicious moderation",
+    }),
+    "buyer cannot hide inventory",
+  );
   const catalog = await ok(
     await anon
       .from("listings")

@@ -60,3 +60,13 @@ Implement the slices fully. Do not simply draw their interfaces and leave button
 - If Supabase/Vercel credentials are not connected, still implement the real integration and migrations; clearly identify which features need environment setup to run and do not invent successful live tests.
 - At each milestone report: completed working flow, tests, blockers, next implementation step.
 - Definition of done: an independent tester can sign up, list a real item with photos, have it approved, search and save it, contact its owner, make a purchase request, and observe the correct statuses using two genuine user sessions plus an admin session.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

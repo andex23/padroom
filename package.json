@@ -12,9 +12,11 @@
     "test:e2e": "playwright test",
     "test:db": "node tests/database.mjs",
     "setup:local": "bash scripts/install-supabase.sh",
-    "db:start": "supabase_cmd=.tools/supabase; SUPABASE_INTERNAL_IMAGE_REGISTRY=docker.io \"$supabase_cmd\" start -x studio,imgproxy,edge-runtime,logflare,vector,supavisor",
+    "db:start": "bash scripts/prepare-vfs-postgres.sh && SUPABASE_INTERNAL_IMAGE_REGISTRY=docker.io .tools/supabase start -x studio,imgproxy,edge-runtime,logflare,vector,supavisor",
     "db:stop": ".tools/supabase stop",
-    "db:reset": ".tools/supabase db reset --local"
+    "db:reset": ".tools/supabase db reset --local",
+    "env:local": "node scripts/configure-local.mjs",
+    "format": "prettier --write src tests scripts *.ts *.mjs package.json"
   },
   "engines": {
     "node": ">=22"
@@ -29,13 +31,16 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@next/eslint-plugin-next": "^16.4.0",
     "@playwright/test": "^1.64.0",
     "@types/node": "^26.6.4",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "eslint": "^9.39.5",
-    "eslint-config-next": "^16.4.0",
+    "eslint": "10.12.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "prettier": "^3.9.9",
     "typescript": "^6.0.3",
+    "typescript-eslint": "^8.71.1",
     "vitest": "^5.0.3"
   },
   "type": "module"

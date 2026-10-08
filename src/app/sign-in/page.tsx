@@ -34,6 +34,9 @@ export default async function SignIn({
       <p style={{ marginTop: 24 }}>
         New here? <Link href="/sign-up">Create an account</Link>
       </p>
+      <p>
+        <Link href="/forgot-password">Reset your password</Link>
+      </p>
       <p className="meta">
         If your account requires confirmation, check your inbox before signing
         in.

@@ -4,7 +4,7 @@ An independent, Nigeria-first gaming resale marketplace built with Next.js App R
 
 ## Implemented first workflow
 
-Register/sign in → complete profile → save listing draft → upload photos → preview/submit → administrator approves → public browse/search/filter → buyer saves, sends a private message and requests a purchase or trade → seller responds → participants cancel or record completed handover.
+Register/sign in (including password recovery) → complete profile → save listing draft → upload photos → preview/submit → administrator approves → public browse/search/filter → buyer saves, sends a private message and requests a purchase or trade → seller responds → participants cancel or record completed handover.
 
 Seller edits return approved listings to drafts. Sellers can withdraw review, archive or mark sold. Reports, moderation reasons, seller suspension/restoration, unread messages and a moderation audit trail are implemented. Conversations refresh on demand; there is no realtime subscription. Listing creation currently requires complete item information before saving a draft; photos are added separately.
 
@@ -24,7 +24,7 @@ npm run env:local
 npm run dev
 ```
 
-`setup:local` installs the pinned Supabase CLI into ignored `.tools/` without global writes and verifies the release SHA-256 checksum. `db:start` uses the supported Docker Hub image registry and excludes optional services. Default local auth uses a local email inbox and immediate signup sessions; hosted deployments must enable email confirmation and configure real SMTP. `env:local` creates an ignored `.env.local` using local generated configuration without printing keys; it preserves an existing file. No service-role key is required by the web application.
+`setup:local` installs the pinned Supabase CLI into ignored `.tools/` without global writes and verifies the release SHA-256 checksum. `db:start` uses the supported Docker Hub image registry and excludes optional services. On Linux x86_64 with Docker’s `vfs` driver, its helper uses checksum-verified Crane to export the pinned Supabase PostgreSQL registry manifest into a single layer. This preserves the verified upstream filesystem, entrypoint, command, environment, user/workdir, volume and signal settings while avoiding excessive layer copies; the CLI supplies the database healthcheck. The local derivative is labeled with its upstream digest, tagged `padroom/postgres-flat:17.6.1.095`, and given the pinned CLI’s expected compatibility alias. Overlay-backed Docker skips this optimization. No TLS or artifact verification is disabled. Default local auth uses a local email inbox and immediate signup sessions; hosted deployments must enable email confirmation and configure real SMTP. `env:local` creates an ignored `.env.local` using local generated configuration without printing keys; it preserves an existing file. No service-role key is required by the web application.
 
 Use the existing isolated checkout in cloud tasks; a Git worktree is unnecessary. `npm run db:stop` stops local services. `npm run db:reset` **destroys local development data** and reapplies migrations; never point this at production. There are no default seeds.
 
@@ -42,7 +42,7 @@ Use the existing isolated checkout in cloud tasks; a Git worktree is unnecessary
 
 The publishable key is deliberately browser-safe, protected by RLS. **Do not put a secret/service-role key in any `NEXT_PUBLIC_` variable.** The app authenticates database operations as the user, including admin actions. Vercel uses the standard Next.js build (`npm run build`) and requires no custom server. Configure an explicit origin for each preview environment; mutation origin checks reject other origins.
 
-4. In Supabase Auth, set Site URL to the application origin and add `<origin>/auth/callback` to allowed redirects. Enable email confirmation, configure SMTP delivery and Supabase’s auth rate limits/CAPTCHA as appropriate. The app supports PKCE email confirmation. Choose password and abuse policies for your pilot.
+4. In Supabase Auth, set Site URL to the application origin and add `<origin>/auth/callback` (including the password-recovery `?next=/reset-password` callback) to allowed redirects. Enable email confirmation, configure SMTP delivery and Supabase’s auth rate limits/CAPTCHA as appropriate. The app supports PKCE email confirmation. Choose password and abuse policies for your pilot.
 5. Sign up an administrator normally, confirm their email and save their profile. In the Supabase SQL editor, bootstrap membership using the actual account UUID:
 
 ```sql

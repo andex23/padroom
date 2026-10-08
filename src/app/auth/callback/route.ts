@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { database } from "@/lib/supabase";
-import { profileInput } from "@/lib/domain";
+import { profileInput, safeNext } from "@/lib/domain";
 export async function GET(request: NextRequest) {
   const code = request.nextUrl.searchParams.get("code");
   const base = process.env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin;
@@ -21,7 +21,12 @@ export async function GET(request: NextRequest) {
             p_city: p.data.city,
           });
       }
-      return NextResponse.redirect(new URL("/account", base));
+      return NextResponse.redirect(
+        new URL(
+          safeNext(request.nextUrl.searchParams.get("next") || "/account"),
+          base,
+        ),
+      );
     }
   }
   return NextResponse.redirect(

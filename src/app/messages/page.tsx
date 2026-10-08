@@ -8,7 +8,7 @@ export default async function Inbox() {
   const { user, db } = await authenticated();
   const { data, error } = await db
     .from("conversations")
-    .select("*,messages(id,sender_id,read_at,created_at)")
+    .select("*,listings(title),messages(id,sender_id,read_at,created_at)")
     .order("created_at", { ascending: false });
   fail(error);
   return (
@@ -26,7 +26,7 @@ export default async function Inbox() {
             <article className="row" key={c.id}>
               <h2>
                 <Link href={`/messages/${c.id}`}>
-                  Conversation / {c.id.slice(0, 8)}
+                  Conversation / {c.listings?.title || "Unavailable listing"}
                 </Link>
               </h2>
               <p className="meta">
