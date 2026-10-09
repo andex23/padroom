@@ -1,0 +1,35 @@
+
+> padroom@0.1.0 test:e2e
+> playwright test --reporter=list,json
+
+
+Running 22 tests using 1 worker
+
+(node:50641) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [desktop] › tests/e2e/management.spec.ts:170:1 › seller photo/edit lifecycle and report moderation (24.5s)
+  ✓   2 [desktop] › tests/e2e/management.spec.ts:335:1 › real trade decline, cancellation, reservations and completed handover (24.3s)
+  ✓   3 [desktop] › tests/e2e/marketplace.spec.ts:5:1 › real seller → moderation → buyer workflow (32.1s)
+  ✓   4 [desktop] › tests/e2e/public.spec.ts:2:1 › approved homepage, responsive navigation and brand font (1.3s)
+  ✓   5 [desktop] › tests/e2e/public.spec.ts:35:1 › private routes require real authentication (1.9s)
+  ✓   6 [desktop] › tests/e2e/public.spec.ts:41:1 › pilot copy and no simulated checkout (720ms)
+  ✓   7 [desktop] › tests/e2e/public.spec.ts:50:1 › cross-origin mutations are rejected (19ms)
+  ✓   8 [desktop] › tests/e2e/public.spec.ts:58:1 › failed auth requests show an error and keep the form usable (846ms)
+  ✓   9 [desktop] › tests/e2e/public.spec.ts:84:1 › drawer filters, search and sorting preserve the selected inventory query (2.0s)
+  ✓  10 [desktop] › tests/e2e/public.spec.ts:124:1 › the catalogue and account shell fit every required viewport (2.6s)
+  ✓  11 [desktop] › tests/e2e/public.spec.ts:154:1 › approved shell hierarchy, four mobile destinations and accessible filter sheet (876ms)
+(node:58353) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  12 [mobile] › tests/e2e/management.spec.ts:170:1 › seller photo/edit lifecycle and report moderation (25.1s)
+  ✓  13 [mobile] › tests/e2e/management.spec.ts:335:1 › real trade decline, cancellation, reservations and completed handover (22.8s)
+  ✓  14 [mobile] › tests/e2e/marketplace.spec.ts:5:1 › real seller → moderation → buyer workflow (31.4s)
+  ✓  15 [mobile] › tests/e2e/public.spec.ts:2:1 › approved homepage, responsive navigation and brand font (1.4s)
+  ✓  16 [mobile] › tests/e2e/public.spec.ts:35:1 › private routes require real authentication (1.8s)
+  ✓  17 [mobile] › tests/e2e/public.spec.ts:41:1 › pilot copy and no simulated checkout (654ms)
+  ✓  18 [mobile] › tests/e2e/public.spec.ts:50:1 › cross-origin mutations are rejected (18ms)
+  ✓  19 [mobile] › tests/e2e/public.spec.ts:58:1 › failed auth requests show an error and keep the form usable (853ms)
+  ✓  20 [mobile] › tests/e2e/public.spec.ts:84:1 › drawer filters, search and sorting preserve the selected inventory query (2.1s)
+  ✓  21 [mobile] › tests/e2e/public.spec.ts:124:1 › the catalogue and account shell fit every required viewport (2.7s)
+  ✓  22 [mobile] › tests/e2e/public.spec.ts:154:1 › approved shell hierarchy, four mobile destinations and accessible filter sheet (1.4s)
+
+  22 passed (3.1m)

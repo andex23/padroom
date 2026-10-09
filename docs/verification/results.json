@@ -1,0 +1,43 @@
+{
+  "verified_on": "2026-10-09",
+  "base_commit": "06f4c630f087a65f4a535f3aa4a30dc97079581b",
+  "environment": "fresh cloud checkout; local Supabase and Chromium",
+  "install": "passed",
+  "setup_local": "passed",
+  "fresh_migration": "202610080001",
+  "lint": "passed",
+  "typecheck": "passed",
+  "unit": {
+    "passed": 30,
+    "failed": 0,
+    "skipped": 0
+  },
+  "database": {
+    "passed_assertions": 74,
+    "failed_assertions": 0,
+    "skipped_assertions": 0
+  },
+  "browser": {
+    "passed": 22,
+    "failed": 0,
+    "skipped": 0,
+    "flaky": 0,
+    "start_time_utc": "2026-10-09T20:43:28.299Z",
+    "duration_ms": 184610.2
+  },
+  "production_build": "passed with local configuration",
+  "cleanup": "zero fixture records and storage objects; 11 application tables have RLS",
+  "screenshots": 22,
+  "historical_red_checks": [
+    "3 redirect regressions failed before validator fix",
+    "1 browser photo geometry regression failed before CSS fix"
+  ],
+  "blocked_checks": [
+    "hosted Supabase migration and RLS validation",
+    "production auth origin/redirect and confirmation",
+    "hosted SMTP delivery and cross-browser email links",
+    "genuine operator administrator access",
+    "public deployment and near-limit Vercel upload"
+  ],
+  "external_changes_performed": false
+}

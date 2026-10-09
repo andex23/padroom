@@ -1,0 +1,5 @@
+
+> padroom@0.1.0 test:db
+> node tests/database.mjs
+
+PASS: 74 real Supabase assertions (auth, private records/photos, publication, saves, messages, requests, concurrent acceptance, trade reservations, moderation, rate limits).

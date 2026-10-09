@@ -55,6 +55,32 @@ test("cross-origin mutations are rejected", async ({ request }) => {
   expect(response.status()).toBe(403);
 });
 
+test("failed auth requests show an error and keep the form usable", async ({
+  page,
+}) => {
+  await page.goto("/sign-in");
+  await page
+    .getByLabel("Email", { exact: true })
+    .fill("no-account@example.test");
+  await page.getByLabel("Password", { exact: true }).fill("LocalFailure123!");
+  await page.route("**/api/command", (route) => route.abort("failed"));
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page.locator("main").getByRole("alert")).toContainText(
+    "Connection failed",
+  );
+  await expect(
+    page.getByRole("button", { name: "Sign in", exact: true }),
+  ).toBeEnabled();
+  await expect(page.getByLabel("Email", { exact: true })).toHaveValue(
+    "no-account@example.test",
+  );
+  await page.unroute("**/api/command");
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page.locator("main").getByRole("alert")).toContainText(
+    "Unable to sign in",
+  );
+});
+
 test("drawer filters, search and sorting preserve the selected inventory query", async ({
   page,
 }) => {

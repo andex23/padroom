@@ -43,10 +43,24 @@ describe("listing validation", () => {
   );
 });
 describe("redirect safety", () => {
+  it.each(["/\t/evil.example", "/\n/evil.example", "/\r/evil.example"])(
+    "rejects callbacks that URL parsing normalizes to an external origin %j",
+    (value) => {
+      const destination = new URL(safeNext(value), "https://padroom.example");
+      expect(destination.origin).toBe("https://padroom.example");
+      expect(destination.pathname).toBe("/");
+    },
+  );
   it.each(["https://evil.example", "//evil.example", "/\\evil.example"])(
     "rejects external callback %s",
     (value) => expect(safeNext(value)).toBe("/"),
   );
   it("keeps internal navigation", () =>
     expect(safeNext("/saved")).toBe("/saved"));
+  it("keeps internal recovery and listing query destinations", () => {
+    expect(safeNext("/reset-password")).toBe("/reset-password");
+    expect(safeNext("/listings/item?city=Benin%20City#photos")).toBe(
+      "/listings/item?city=Benin%20City#photos",
+    );
+  });
 });

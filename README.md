@@ -89,7 +89,9 @@ Playwright tests the approved homepage on desktop/mobile and a genuine multi-acc
 PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:e2e
 ```
 
-Temporary test screenshots and traces are excluded from Git. Approved before/after UI captures are retained in `docs/screenshots`; reproduce the two current homepage captures against the running app with `npm run screenshots:home`. See `docs/HOME_UI_ACCEPTANCE.md` for the comparison against the approved contract. The production default never contains a synthetic catalog. See `docs/IMPLEMENTATION.md` for the milestone design and `docs/VALIDATION.md` for recorded results and remaining launch work.
+Temporary test screenshots and traces are excluded from Git. Approved before/after UI captures and selected independent verification captures are retained in `docs/screenshots`; reproduce the two current homepage captures against the running app with `npm run screenshots:home`. See `docs/HOME_UI_ACCEPTANCE.md` for the comparison against the approved contract. The production default never contains a synthetic catalog. See `docs/IMPLEMENTATION.md` for the milestone design and `docs/VALIDATION.md` for recorded results and remaining launch work.
+
+The separate [fresh-checkout cloud verification](docs/CLOUD_VERIFICATION.md) records independently rerun checks, targeted fixes, retained desktop/mobile evidence and outstanding hosted launch configuration.
 
 ## Specifications
 
