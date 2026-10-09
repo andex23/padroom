@@ -40,7 +40,27 @@ describe("real upload content validation", () => {
   });
   it("rejects oversized files before decoding", async () => {
     await expect(
-      normalizePhoto(new Uint8Array(5 * 1024 * 1024 + 1), "image/jpeg"),
-    ).rejects.toThrow("up to 5 MB");
+      normalizePhoto(new Uint8Array(4_000_001), "image/jpeg"),
+    ).rejects.toThrow("up to 4 MB");
   });
+  it.each([3_999_999, 4_000_000])(
+    "decodes a valid %i-byte source and preserves the existing JPEG output",
+    async (size) => {
+      const source = await sharp({
+        create: { width: 2000, height: 1200, channels: 3, background: "#eee" },
+      })
+        .png()
+        .toBuffer();
+      const padded = Buffer.concat([
+        source,
+        Buffer.alloc(size - source.length),
+      ]);
+      const output = await normalizePhoto(padded, "image/png");
+      expect(output).toEqual(await normalizePhoto(source, "image/png"));
+      const metadata = await sharp(output).metadata();
+      expect(metadata.width).toBe(1600);
+      expect(metadata.height).toBe(960);
+      expect(metadata.format).toBe("jpeg");
+    },
+  );
 });

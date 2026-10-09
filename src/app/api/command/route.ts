@@ -10,31 +10,14 @@ import {
 } from "@/lib/domain";
 import { z } from "zod";
 import { normalizePhoto } from "@/lib/image";
+import { boundedForm } from "@/lib/command-body";
+import {
+  MAX_PHOTO_BYTES,
+  PHOTO_SIZE_ERROR,
+  PayloadTooLargeError,
+} from "@/lib/upload-policy";
 export const runtime = "nodejs";
 const text = (f: FormData, n: string) => String(f.get(n) ?? "");
-async function boundedForm(request: NextRequest) {
-  const reader = request.body?.getReader();
-  if (!reader) throw new Error("Empty request");
-  const chunks: Uint8Array[] = [];
-  let length = 0;
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    length += value.length;
-    if (length > 6 * 1024 * 1024) {
-      await reader.cancel();
-      throw new Error(
-        "Request too large. Upload one photo at a time (maximum 5 MB).",
-      );
-    }
-    chunks.push(value);
-  }
-  return new Request(request.url, {
-    method: "POST",
-    headers: { "content-type": request.headers.get("content-type") ?? "" },
-    body: Buffer.concat(chunks),
-  }).formData();
-}
 export async function POST(request: NextRequest) {
   // Cookie-authenticated mutations must originate from this application.
   const origin = request.headers.get("origin");
@@ -169,12 +152,10 @@ export async function POST(request: NextRequest) {
         case "upload": {
           const listing = id("listing_id");
           const file = f.get("photo");
-          if (
-            !(file instanceof File) ||
-            !file.size ||
-            file.size > 5 * 1024 * 1024
-          )
-            throw new Error("Choose a photo up to 5 MB.");
+          if (!(file instanceof File) || !file.size)
+            throw new Error(PHOTO_SIZE_ERROR);
+          if (file.size > MAX_PHOTO_BYTES)
+            throw new PayloadTooLargeError(PHOTO_SIZE_ERROR);
           if (!["image/jpeg", "image/png", "image/webp"].includes(file.type))
             throw new Error("Use a JPEG, PNG or WebP photo.");
           const { data: l, error } = await db
@@ -318,6 +299,9 @@ export async function POST(request: NextRequest) {
         : error instanceof Error
           ? error.message
           : "Unable to complete request. Try again.";
-    return NextResponse.json({ error: message }, { status: 400 });
+    return NextResponse.json(
+      { error: message },
+      { status: error instanceof PayloadTooLargeError ? 413 : 400 },
+    );
   }
 }

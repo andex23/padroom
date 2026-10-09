@@ -123,12 +123,15 @@ async function draft(page: Page, title: string) {
   return page.url().split("/")[4];
 }
 
-async function upload(page: Page) {
-  const buffer = await sharp({
+async function upload(page: Page, size?: number) {
+  const image = await sharp({
     create: { width: 160, height: 200, channels: 3, background: "#dddddd" },
   })
     .png()
     .toBuffer();
+  const buffer = size
+    ? Buffer.concat([image, Buffer.alloc(size - image.length)])
+    : image;
   await page.getByLabel("Add a photo").setInputFiles({
     name: "local-verification.png",
     mimeType: "image/png",
@@ -192,7 +195,65 @@ test("seller photo/edit lifecycle and report moderation", async ({
       .filter({ hasText: /unsupported image format|Invalid photo content/ }),
   ).toBeVisible();
   await expect(seller.getByRole("img")).toHaveCount(0);
-  await upload(seller);
+  await expect(seller.getByText("1–8 photos.", { exact: false })).toContainText(
+    "up to 4 MB each",
+  );
+  const tooLarge = Buffer.alloc(4_000_001);
+  await seller.getByLabel("Add a photo").setInputFiles({
+    name: "too-large.png",
+    mimeType: "image/png",
+    buffer: tooLarge,
+  });
+  const uploadRequest = seller
+    .waitForRequest(
+      (request) =>
+        request.method() === "POST" && request.url().endsWith("/api/command"),
+      { timeout: 1500 },
+    )
+    .then(
+      () => true,
+      () => false,
+    );
+  await seller
+    .getByRole("button", { name: "Upload photo", exact: true })
+    .click();
+  await expect(
+    seller
+      .locator("main")
+      .getByRole("alert")
+      .filter({ hasText: "Choose a photo up to 4 MB." }),
+  ).toBeVisible();
+  await expect(
+    seller.getByRole("button", { name: "Upload photo", exact: true }),
+  ).toBeEnabled();
+  expect(await uploadRequest, "Oversized photo must never be sent").toBe(false);
+  await capture(seller, "11-upload-limit");
+  // A caller bypassing the browser must also be rejected by the real route.
+  const rejected = await seller.request.post("/api/command", {
+    headers: { origin: "http://localhost:3000" },
+    multipart: {
+      command: "upload",
+      listing_id: id,
+      photo: { name: "too-large.png", mimeType: "image/png", buffer: tooLarge },
+    },
+  });
+  expect(rejected.status()).toBe(413);
+  expect((await rejected.json()).error).toBe("Choose a photo up to 4 MB.");
+  expect(
+    sql(`select count(*) from public.listing_images where listing_id='${id}';`),
+  ).toBe("0");
+  const acceptedRequest = seller.waitForRequest(
+    (request) =>
+      request.method() === "POST" && request.url().endsWith("/api/command"),
+  );
+  // Real decoded PNG, padded to the exact source-byte boundary.
+  await upload(seller, 4_000_000);
+  const headers = await (await acceptedRequest).allHeaders();
+  // Chromium omits Blob-backed binary post data from Playwright's body accessor.
+  const transmittedBytes = Number(headers["content-length"]);
+  expect(transmittedBytes).toBeGreaterThan(4_000_000);
+  expect(transmittedBytes).toBeLessThanOrEqual(4_250_000);
+  expect(transmittedBytes).toBeLessThan(4_500_000);
   await seller
     .getByRole("button", { name: "Remove photo", exact: true })
     .click();

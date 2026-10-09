@@ -2,6 +2,8 @@
 
 This records the implementation task's original validation. A separate fresh-checkout rerun, two defect fixes, expanded desktop/mobile coverage and current launch requirements are documented in [Independent cloud verification](CLOUD_VERIFICATION.md). That newer report supersedes the test counts and remaining-browser-coverage item below; the historical results are retained.
 
+The later [upload compatibility follow-up](UPLOAD_COMPATIBILITY.md) records the shared photo/request budgets, boundary regressions and latest rerun results.
+
 Verified in the current cloud instance using Node.js 24.19.0, Next.js 16.4.0, genuine local Supabase services and system Chromium through Playwright. No mocked database, authentication, transaction or catalog was used.
 
 | Check | Result |

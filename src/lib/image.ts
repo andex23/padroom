@@ -1,7 +1,8 @@
 import sharp from "sharp";
+import { MAX_PHOTO_BYTES, PHOTO_SIZE_ERROR } from "./upload-policy";
 export async function normalizePhoto(bytes: Uint8Array, mime: string) {
-  if (!bytes.byteLength || bytes.byteLength > 5 * 1024 * 1024)
-    throw new Error("Choose a photo up to 5 MB.");
+  if (!bytes.byteLength || bytes.byteLength > MAX_PHOTO_BYTES)
+    throw new Error(PHOTO_SIZE_ERROR);
   if (!["image/jpeg", "image/png", "image/webp"].includes(mime))
     throw new Error("Use a JPEG, PNG or WebP photo.");
   const image = sharp(Buffer.from(bytes), {

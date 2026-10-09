@@ -55,6 +55,20 @@ test("cross-origin mutations are rejected", async ({ request }) => {
   expect(response.status()).toBe(403);
 });
 
+test("oversized command bodies return 413 before authentication", async ({
+  request,
+}) => {
+  const response = await request.post("/api/command", {
+    headers: {
+      origin: "http://localhost:3000",
+      "content-type": "application/octet-stream",
+    },
+    data: Buffer.alloc(4_250_001),
+  });
+  expect(response.status()).toBe(413);
+  expect((await response.json()).error).toContain("maximum 4 MB");
+});
+
 test("failed auth requests show an error and keep the form usable", async ({
   page,
 }) => {
@@ -79,6 +93,25 @@ test("failed auth requests show an error and keep the form usable", async ({
   await expect(page.locator("main").getByRole("alert")).toContainText(
     "Unable to sign in",
   );
+  // Provider 413 bodies can be plain text; do not disguise these as offline errors.
+  await page.route("**/api/command", (route) =>
+    route.fulfill({
+      status: 413,
+      contentType: "text/plain",
+      body: "FUNCTION_PAYLOAD_TOO_LARGE",
+    }),
+  );
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page.locator("main").getByRole("alert")).toContainText(
+    "Request too large",
+  );
+  await expect(
+    page.getByRole("button", { name: "Sign in", exact: true }),
+  ).toBeEnabled();
+  await expect(page.getByLabel("Email", { exact: true })).toHaveValue(
+    "no-account@example.test",
+  );
+  await page.unroute("**/api/command");
 });
 
 test("drawer filters, search and sorting preserve the selected inventory query", async ({
@@ -221,6 +254,10 @@ test("approved shell hierarchy, four mobile destinations and accessible filter s
       "page",
     );
     await mobile.getByRole("link", { name: "Home", exact: true }).click();
+    await expect(page).toHaveURL(/\/$/);
+    await expect(
+      mobile.getByRole("link", { name: "Home", exact: true }),
+    ).toHaveAttribute("aria-current", "page");
   }
   const trigger = page.getByRole("button", { name: "Filter", exact: true });
   await trigger.click();

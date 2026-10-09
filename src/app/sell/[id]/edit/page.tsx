@@ -50,7 +50,7 @@ export default async function Edit({
           02 / Photos
         </h2>
         <p className="meta">
-          1–8 photos. JPEG, PNG or WebP, up to 5 MB each. Photos are resized and
+          1–8 photos. JPEG, PNG or WebP, up to 4 MB each. Photos are resized and
           metadata removed.
         </p>
         <div className="photos-edit">

@@ -1,5 +1,7 @@
 # Independent cloud verification / 9 October 2026
 
+The subsequent [local upload compatibility follow-up](UPLOAD_COMPATIBILITY.md) addresses the Vercel body-limit risk identified here and records the newer check counts. This report and its logs retain the original independent review results.
+
 Verified from a fresh, initially clean cloud checkout of `andex23/padroom` at implementation commit `06f4c630f087a65f4a535f3aa4a30dc97079581b`, on branch `work`. The existing marketplace, approved homepage structure, Paper Mono, migration and private-data policies were preserved. No user's Mac was used.
 
 Environment: Node 24.19.0, npm 11.9.0, Next.js 16.4.0, Playwright 1.64.0, system Chromium, Supabase CLI 2.78.1 and Docker with `vfs`. Repository-local `.agents/skills` and workspace `.agents` had no Superpowers files; the cloud Superpowers systematic-debugging, test-driven-development and verification-before-completion skills were available and used. Screenshot inspection followed the product audit workflow.

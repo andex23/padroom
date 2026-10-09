@@ -1,0 +1,12 @@
+
+> padroom@0.1.0 test
+> vitest run
+
+
+ RUN  v5.0.3 /workspace/padroom
+
+
+ Test Files  3 passed (3)
+      Tests  41 passed (41)
+   Start at  21:01:02
+   Duration  2.63s (tests 82%, import 10%, transform 7%)
