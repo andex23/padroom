@@ -4,11 +4,12 @@
 Build PADROOM as a REAL, working Nigerian gaming resale marketplace web application in this existing repository. Do not make a static landing page, a throwaway prototype, a clickable Figma-like mockup, or a front end backed by a hard-coded product catalog. The first release is a functioning closed-beta marketplace with authenticated buyers and sellers, real listings and photos, saved items, conversations / purchase requests, and admin moderation. Make it production-oriented and deployable.
 
 Read all of these before making implementation decisions:
-1. docs/BRAND.md — binding visual and copy design direction.
-2. docs/PRODUCT.md — workflows, product scope, acceptance criteria.
-3. docs/ENGINEERING.md — architecture, database, security, tests, deployment.
+1. **docs/APPROVED_HOME_UI.md — the OWNER-APPROVED homepage structure and visual acceptance contract. HIGHEST PRIORITY for layout.**
+2. docs/BRAND.md — overall visual and copy system for the rest of the app.
+3. docs/PRODUCT.md — workflows, product scope, acceptance criteria.
+4. docs/ENGINEERING.md — architecture, database, security, tests, deployment.
 
-If the docs conflict, ask the repository owner to resolve product-critical conflicts instead of quietly changing requirements.
+**Priority rule:** for homepage structure, content order, labels, desktop/mobile navigation, spacing and aesthetics, docs/APPROVED_HOME_UI.md takes precedence over generic recommendations elsewhere. Product security and functional obligations in PRODUCT/ENGINEERING still apply. If other docs contradict the approved home layout, follow the approved layout. Do not create a different homepage from scratch.
 
 ## Decisions already made
 - Product name: PADROOM. Lowercase typographic wordmark: padroom.
@@ -54,6 +55,8 @@ Implement the slices fully. Do not simply draw their interfaces and leave button
 - Do not download random commercial photography or use unlicensed PlayStation logos/icons in the brand identity. Seller-supplied listing images are uploaded by actual users.
 
 ## Codex execution protocol
+- **FIRST visually inspect the existing homepage implementation** (including local/unpushed changes, if present), compare it section-by-section to docs/APPROVED_HOME_UI.md, and make the minimum structural corrections necessary. Do not discard existing functioning backend code.
+- **Take 390px mobile and 1280px desktop screenshots**, review them against the contract, and fix deviations *before* calling homepage design done. A feature list without screenshot verification does not establish fidelity.
 - First examine the repository and these docs. Create a concise implementation plan and then start coding; do not stop at a plan.
 - Make deliberate commits by functional milestone. Use migrations and a documented setup path.
 - Run install, lint, typecheck, tests and production build. Fix failures and provide evidence in your final handoff.
