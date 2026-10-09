@@ -1,5 +1,7 @@
 # PADROOM — Brand and interface system
-Status: Working design direction for v1. Updated 2026-10-08.
+Status: Working design direction for v1. Updated 2026-10-09.
+
+**HOME LAYOUT OVERRIDE:** The owner-approved mobile and desktop structure is specified in [APPROVED_HOME_UI.md](APPROVED_HOME_UI.md). It is mandatory. Any general layout suggestion here that conflicts with it is superseded for the homepage.
 
 ## Identity
 **Name:** PADROOM / wordmark shown as **padroom.**
@@ -53,26 +55,28 @@ Example:
 
 ## Grid, shape and rhythm
 - Mobile-first: compact top nav, full-width search input, horizontally scrollable categories, 2-column product grid when viewport allows (single column for narrower accessibility needs).
-- Desktop: 12-column responsive grid; persistent left filter panel when appropriate; 3–4 listing columns; max container ~1440px; 24–36px outer gutters.
+- Desktop: 12-column responsive grid; 3–4 listing columns; max container ~1440px; 24–36px outer gutters. Homepage filters open on demand; do not introduce a default left-sidebar that replaces the approved composition.
 - Spacing system: 4 / 8 / 12 / 16 / 24 / 32 / 48; favor density and intentional negative space over giant empty bands.
 - Square or 4px corner radius for product images and cards; inputs radius 4–6px. No giant pill cards.
 - Thin 1px borders. Shadows only when essential (dialogs, menus), not on every card.
 - Product imagery is central. Cards use consistent 4:5 or 1:1 media aspect ratio with object-fit:contain when needed; actual seller photos may be messy, so image crop and visible fallback must be robust.
 - Hover/focus: outline, underline, tonal backgrounds. Keep high-contrast keyboard focus ring (2px or greater).
 
-## App information architecture
-Desktop header: "padroom." | Browse | Consoles | Games | Accessories | Sell | [Search] | Saved | Messages | Account
-Mobile: compact wordmark + search + account; bottom nav for Browse / Saved / Sell / Inbox / Account (labels always present for accessibility).
-"Sell" prominent but not neon. Do not create a separate front-page billboard.
+## App information architecture — locked approved home layout
+**Refer to [APPROVED_HOME_UI.md](APPROVED_HOME_UI.md) for exact hierarchy, sizing, labels, acceptance screenshots and interaction contracts.**
 
-### Browse / home
-1. Header and search
-2. Small title: "Browse" or "New in", never a marketing manifesto
-3. Categories: All / Consoles / Games / Controllers / Accessories
-4. Filter: price, condition, brand/device, city, seller, availability; sort newest / price
-5. Product grid with image, title, actual NGN price, condition and city
-6. Useful empty state, never fake products. Editorial collection cards can appear *after* real inventory.
-A first-time visitor should understand what is for sale within seconds.
+Mobile homepage:
+1. First row: **padroom.** wordmark left, heart (saved) and person (account) icons right.
+2. Full-width search input directly below the header.
+3. One horizontal plain-text category row: **Discover / Consoles / Games / Accessories**.
+4. Hairline divider.
+5. Section header **Fresh in the room** on left, **Filter** and sliders icon on right.
+6. Actual database-backed inventory cards in a two-column grid with real price, condition and city; or honest empty state.
+7. Exactly four safe-area-aware bottom tab destinations: **Home / Explore / Sell / Account**. Saved is via top heart; inbox is within Account or listing conversations. Do not add a fifth bottom tab.
+
+Desktop homepage keeps the same commerce-first sequence, using more product columns and a standard header rather than an alternate marketing page.
+
+Do **not** insert a slogan hero, ad banners, colored category pills, decorative "verified" labels, oversized campaign headings, a default filter sidebar, or featured collections before the grid.
 
 ### Product detail
 Large honest photo gallery. Right summary: title, real price, condition, city, posted date, seller name, key facts (tested?, box?, accessories included?, known faults?), description.
@@ -108,4 +112,4 @@ Quiet editorial layouts with table/list treatment and mobile adaptation. Minimal
 - Real code implementations of browse, product details, sell, saves, inbox, profile and admin screens.
 - Snapshot/screenshot review for mobile and desktop before marking styling done.
 
-This document intentionally defines a design system, not a fixed screenshot to clone. Make functional details excellent before ornamental variations.
+For the homepage, [APPROVED_HOME_UI.md](APPROVED_HOME_UI.md) is the exact approved structural contract. Do not reinterpret its layout. On all other screens, use this design system while preserving functional requirements.
