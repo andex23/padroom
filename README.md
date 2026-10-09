@@ -2,6 +2,13 @@
 
 An independent, Nigeria-first gaming resale marketplace built with Next.js App Router, strict TypeScript and Supabase PostgreSQL/Auth/Storage. Inventory is database-backed; an empty database stays empty. Paper Mono is self-hosted under the SIL Open Font License in `public/fonts`.
 
+## Start here (Codex)
+1. Read [AGENTS.md](AGENTS.md) for implementation instructions.
+2. **Implement [Approved homepage UI](docs/APPROVED_HOME_UI.md) exactly** before adapting the other screens. Do not substitute a generic marketplace landing page.
+3. Follow the wider [Brand & UI direction](docs/BRAND.md).
+4. Build the actual flows in [Product requirements](docs/PRODUCT.md).
+5. Follow [Engineering specification](docs/ENGINEERING.md) for architecture, security, testing and release.
+
 ## Implemented first workflow
 
 Register/sign in (including password recovery) → complete profile → save listing draft → upload photos → preview/submit → administrator approves → public browse/search/filter → buyer saves, sends a private message and requests a purchase or trade → seller responds → participants cancel or record completed handover.
@@ -86,4 +93,4 @@ Temporary screenshots and traces are excluded from Git. The production default n
 
 ## Specifications
 
-Read `AGENTS.md`, `docs/BRAND.md`, `docs/PRODUCT.md` and `docs/ENGINEERING.md` before extending the marketplace. PADROOM is not an official PlayStation, Sony, Xbox or Nintendo outlet.
+Read `AGENTS.md`, `docs/APPROVED_HOME_UI.md`, `docs/BRAND.md`, `docs/PRODUCT.md` and `docs/ENGINEERING.md` before extending the marketplace. PADROOM is not an official PlayStation, Sony, Xbox or Nintendo outlet.
