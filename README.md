@@ -5,10 +5,11 @@ A Nigeria-first, independent marketplace for gaming equipment. Find, buy, sell a
 **Status:** Specification and production implementation brief. The application has not yet been implemented. This repository is intended for Codex to build into a working, backend-connected web app — not a marketing homepage or static demo.
 
 ## Start here (Codex)
-1. Read [AGENTS.md](AGENTS.md) for the implementation mandate and non-negotiable constraints.
-2. Follow [Brand & UI direction](docs/BRAND.md).
-3. Build the flows in [Product requirements](docs/PRODUCT.md).
-4. Use [Engineering specification](docs/ENGINEERING.md) for the stack, data model, security and release criteria.
+1. Read [AGENTS.md](AGENTS.md) for implementation instructions.
+2. **Implement [Approved homepage UI](docs/APPROVED_HOME_UI.md) exactly** before adapting the other screens. Do not substitute a generic marketplace landing page.
+3. Follow the wider [Brand & UI direction](docs/BRAND.md).
+4. Build the actual flows in [Product requirements](docs/PRODUCT.md).
+5. Follow [Engineering specification](docs/ENGINEERING.md) for architecture, security, testing and release.
 
 ## Product approach
 Mobile-first commerce and inventory discovery. No large promotional hero. Real seller inventory, accounts, saved listings, listing submissions, buyer/seller conversations, purchase requests and an admin moderation queue.
