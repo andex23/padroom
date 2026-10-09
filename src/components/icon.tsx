@@ -9,7 +9,10 @@ export type IconName =
   | "account"
   | "browse"
   | "filter"
-  | "close";
+  | "close"
+  | "heart"
+  | "home"
+  | "plus-square";
 const paths: Record<IconName, React.ReactNode> = {
   search: (
     <>
@@ -20,6 +23,20 @@ const paths: Record<IconName, React.ReactNode> = {
   arrow: (
     <>
       <path d="M5 12h14M13 6l6 6-6 6" />
+    </>
+  ),
+  heart: (
+    <path d="M20.5 5.6a5.2 5.2 0 0 0-7.4 0L12 6.7l-1.1-1.1a5.2 5.2 0 0 0-7.4 7.4L12 21l8.5-8a5.2 5.2 0 0 0 0-7.4Z" />
+  ),
+  home: (
+    <>
+      <path d="m3 10 9-7 9 7M5 9v12h14V9M9 21v-8h6v8" />
+    </>
+  ),
+  "plus-square": (
+    <>
+      <rect x="3" y="3" width="18" height="18" rx="2" />
+      <path d="M12 7v10M7 12h10" />
     </>
   ),
   plus: <path d="M12 5v14M5 12h14" />,

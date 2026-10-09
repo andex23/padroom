@@ -8,11 +8,13 @@ export function NavLink({
   label,
   icon,
   className,
+  iconOnly = false,
 }: {
   href: string;
   label: string;
   icon?: IconName;
   className?: string;
+  iconOnly?: boolean;
 }) {
   const path = usePathname();
   const active =
@@ -28,7 +30,7 @@ export function NavLink({
       aria-current={active ? "page" : undefined}
     >
       {icon && <Icon name={icon} />}
-      <span>{label}</span>
+      <span className={iconOnly ? "sr-only" : undefined}>{label}</span>
     </Link>
   );
 }

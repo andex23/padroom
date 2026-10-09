@@ -1,30 +1,63 @@
 "use client";
-import { useState } from "react";
+import { useId, useRef, useState } from "react";
 import { Icon } from "./icon";
-export function FilterPanel({ children }: { children: React.ReactNode }) {
+export function FilterPanel({
+  children,
+  count = 0,
+}: {
+  children: React.ReactNode;
+  count?: number;
+}) {
+  const dialog = useRef<HTMLDialogElement>(null);
   const [open, setOpen] = useState(false);
+  const id = useId();
   return (
-    <aside className="filters">
-      <div className="filter-heading">
-        <h2>Filters</h2>
-        <Icon name="filter" />
-      </div>
+    <>
       <button
         type="button"
-        className="secondary filter-toggle"
+        className="feed-filter"
+        aria-haspopup="dialog"
         aria-expanded={open}
-        aria-controls="filter-options"
-        onClick={() => setOpen(!open)}
+        aria-controls={id}
+        onClick={() => {
+          dialog.current?.showModal();
+          setOpen(true);
+        }}
       >
         <Icon name="filter" />
-        {open ? "Hide filters" : "Filters & sort"}
+        Filter{count > 0 && <span className="filter-count">({count})</span>}
       </button>
-      <div
-        id="filter-options"
-        className={open ? "filter-options open" : "filter-options"}
+      <dialog
+        ref={dialog}
+        id={id}
+        className="filter-sheet"
+        aria-labelledby={`${id}-title`}
+        onClose={() => setOpen(false)}
+        onClick={(event) => {
+          if (event.target !== event.currentTarget) return;
+          const rect = event.currentTarget.getBoundingClientRect();
+          if (
+            event.clientX < rect.left ||
+            event.clientX > rect.right ||
+            event.clientY < rect.top ||
+            event.clientY > rect.bottom
+          )
+            dialog.current?.close();
+        }}
       >
-        {children}
-      </div>
-    </aside>
+        <div className="sheet-heading">
+          <h2 id={`${id}-title`}>Filters</h2>
+          <button
+            className="icon-button"
+            type="button"
+            aria-label="Close filters"
+            onClick={() => dialog.current?.close()}
+          >
+            <Icon name="close" />
+          </button>
+        </div>
+        <div className="sheet-content">{children}</div>
+      </dialog>
+    </>
   );
 }

@@ -16,7 +16,8 @@
     "db:stop": ".tools/supabase stop",
     "db:reset": ".tools/supabase db reset --local",
     "env:local": "node scripts/configure-local.mjs",
-    "format": "prettier --write src tests scripts *.ts *.mjs package.json"
+    "format": "prettier --write src tests scripts *.ts *.mjs package.json",
+    "screenshots:home": "node scripts/capture-homepage.mjs"
   },
   "engines": {
     "node": ">=22"

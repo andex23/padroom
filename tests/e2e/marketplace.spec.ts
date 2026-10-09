@@ -2,14 +2,13 @@ import { test, expect, type Page } from "@playwright/test";
 import { existsSync, readFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import sharp from "sharp";
-test("real seller → moderation → buyer workflow", async ({ browser }) => {
+test("real seller → moderation → buyer workflow", async ({
+  browser,
+  viewport,
+}) => {
   test.skip(
     !existsSync(".env.local"),
     "A running isolated local Supabase and .env.local are required.",
-  );
-  test.skip(
-    test.info().project.name !== "desktop",
-    "The multi-account transaction is tested once; public/mobile tests run separately.",
   );
   const localConfig = readFileSync(".env.local", "utf8");
   const configuredUrl =
@@ -47,7 +46,9 @@ test("real seller → moderation → buyer workflow", async ({ browser }) => {
   );
   let password = crypto.randomUUID() + "aA1!";
   const contexts = await Promise.all(
-    emails.map(() => browser.newContext({ baseURL: "http://localhost:3000" })),
+    emails.map(() =>
+      browser.newContext({ baseURL: "http://localhost:3000", viewport }),
+    ),
   );
   const [seller, buyer, admin] = await Promise.all(
     contexts.map((c) => c.newPage()),
@@ -136,6 +137,25 @@ test("real seller → moderation → buyer workflow", async ({ browser }) => {
     await buyer.goto("/");
     await buyer.getByRole("searchbox").fill(title);
     await buyer.getByRole("button", { name: "Search", exact: true }).click();
+    const composition = await buyer
+      .locator(".listing-grid")
+      .evaluate((grid) => {
+        const photo = grid
+          .querySelector(".card-photo")!
+          .getBoundingClientRect();
+        return {
+          columns: getComputedStyle(grid).gridTemplateColumns.split(" ").length,
+          ratio: photo.width / photo.height,
+          top: photo.top,
+          overflow: document.documentElement.scrollWidth > innerWidth,
+        };
+      });
+    expect(composition.columns).toBe(
+      test.info().project.name === "mobile" ? 2 : 4,
+    );
+    expect(composition.ratio).toBeCloseTo(4 / 5, 2);
+    expect(composition.top).toBeLessThan(360);
+    expect(composition.overflow).toBe(false);
     await buyer
       .getByRole("article")
       .filter({ has: buyer.getByRole("heading", { name: title, exact: true }) })
