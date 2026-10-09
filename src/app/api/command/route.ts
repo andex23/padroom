@@ -224,13 +224,16 @@ export async function POST(request: NextRequest) {
           redirect = `/messages/${result}`;
           break;
         }
-        case "message":
+        case "message": {
+          const conversationId = id();
           await rpc("send_message", {
-            p_conversation: id(),
+            p_conversation: conversationId,
             p_body: bodyInput.parse(text(f, "body")),
           });
           message = "Message sent.";
+          redirect = `/messages/${conversationId}`;
           break;
+        }
         case "read-messages":
           await rpc("read_messages", { p_conversation: id() });
           message = "Marked as read.";

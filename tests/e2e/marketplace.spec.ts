@@ -194,6 +194,59 @@ test("real seller → moderation → buyer workflow", async ({
     await expect(
       buyer.getByText("Yes. Let’s arrange an inspection.", { exact: true }),
     ).toBeVisible();
+    // Exercise real persisted history, not a fake catalog or mocked response.
+    const conversationId = new URL(conversation).pathname.split("/")[2];
+    const history = (n: number) =>
+      `Private history ${token} message ${String(n).padStart(3, "0")}`;
+    for (let n = 1; n <= 30; n++) {
+      const sent = await buyer.request.post("/api/command", {
+        headers: { origin: "http://localhost:3000" },
+        multipart: { command: "message", id: conversationId, body: history(n) },
+      });
+      expect(sent.ok()).toBe(true);
+    }
+    await buyer.goto(conversation);
+    await expect(buyer.locator(".message")).toHaveCount(25);
+    await expect(buyer.getByText(history(30), { exact: true })).toBeVisible();
+    await expect(buyer.getByText(history(1), { exact: true })).toHaveCount(0);
+    await buyer
+      .getByRole("link", { name: "Older messages", exact: true })
+      .click();
+    const olderPage = buyer.url();
+    await expect(buyer.getByText(history(1), { exact: true })).toBeVisible();
+    const arrived = await seller.request.post("/api/command", {
+      headers: { origin: "http://localhost:3000" },
+      multipart: {
+        command: "message",
+        id: conversationId,
+        body: "New reply while viewing history",
+      },
+    });
+    expect(arrived.ok()).toBe(true);
+    await buyer.reload();
+    await expect(buyer.getByText(history(1), { exact: true })).toBeVisible();
+    await expect(
+      buyer.getByText("New reply while viewing history", { exact: true }),
+    ).toHaveCount(0);
+    await admin.goto(olderPage);
+    await expect(
+      admin.getByRole("heading", { name: "Page not found" }),
+    ).toBeVisible();
+    await buyer
+      .getByLabel("Reply", { exact: true })
+      .fill("Reply from earlier history");
+    await buyer
+      .getByRole("button", { name: "Send reply", exact: true })
+      .click();
+    await expect(buyer).toHaveURL(conversation);
+    await expect(
+      buyer.getByText("Reply from earlier history", { exact: true }),
+    ).toBeVisible();
+    await expect(buyer.getByText(history(1), { exact: true })).toHaveCount(0);
+    await buyer.goto(`${conversation}?before=invalid-cursor`);
+    await expect(
+      buyer.getByRole("heading", { name: "Page not found" }),
+    ).toBeVisible();
     await buyer.goto(`/listings/${id}`);
     await buyer.getByText("Request to buy", { exact: true }).click();
     await buyer.getByRole("button", { name: "Send purchase request" }).click();

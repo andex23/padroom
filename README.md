@@ -13,7 +13,7 @@ An independent, Nigeria-first gaming resale marketplace built with Next.js App R
 
 Register/sign in (including password recovery) → complete profile → save listing draft → upload photos → preview/submit → administrator approves → public browse/search/filter → buyer saves, sends a private message and requests a purchase or trade → seller responds → participants cancel or record completed handover.
 
-Seller edits return approved listings to drafts. Sellers can withdraw review, archive or mark sold. Reports, moderation reasons, seller suspension/restoration, unread messages and a moderation audit trail are implemented. Conversations refresh on demand; there is no realtime subscription. Listing creation currently requires complete item information before saving a draft; photos are added separately.
+Seller edits return approved listings to drafts. Sellers can withdraw review, archive or mark sold. Reports, moderation reasons, seller suspension/restoration, unread messages and a moderation audit trail are implemented. Conversations refresh on demand; there is no realtime subscription. History loads 25 messages at a time with private, conversation-scoped cursors; replies from an earlier page return to the latest messages. Listing creation currently requires complete item information before saving a draft; photos are added separately.
 
 **Pilot:** Payments and delivery are arranged separately. PADROOM does not hold funds or guarantee transactions. No checkout, escrow, wallet, payout, shipment or seller-verification simulation is included.
 
@@ -83,13 +83,13 @@ npm run test:e2e
 
 `test:db` requires running **isolated local Supabase**, `.env.local` and Docker. It refuses a non-loopback URL, creates genuine temporary auth accounts, exercises real API calls and database concurrency, and removes its tagged fixtures afterward. It tests cross-account draft, message, conversation, saved-item, request and storage privacy; unauthorized writes/moderation; real uploads/publication; purchase completion; trade ownership/reservations; suspension; audit immutability and rate limiting.
 
-Playwright tests public pages on desktop/mobile and a genuine multi-account seller → admin → buyer flow when local Supabase is configured. For this cloud image’s preinstalled Chromium, use:
+Playwright tests the approved homepage on desktop/mobile and a genuine multi-account seller → admin → buyer flow at both 390px and 1280px when local Supabase is configured. It also exercises persisted conversation pagination, concurrent arrivals and unauthorized history access. For this cloud image’s preinstalled Chromium, use:
 
 ```bash
 PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:e2e
 ```
 
-Temporary screenshots and traces are excluded from Git. The production default never contains a synthetic catalog. See `docs/IMPLEMENTATION.md` for the milestone design and `docs/VALIDATION.md` for recorded results and remaining launch work.
+Temporary test screenshots and traces are excluded from Git. Approved before/after UI captures are retained in `docs/screenshots`; reproduce the two current homepage captures against the running app with `npm run screenshots:home`. See `docs/HOME_UI_ACCEPTANCE.md` for the comparison against the approved contract. The production default never contains a synthetic catalog. See `docs/IMPLEMENTATION.md` for the milestone design and `docs/VALIDATION.md` for recorded results and remaining launch work.
 
 ## Specifications
 

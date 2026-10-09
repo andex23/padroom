@@ -8,8 +8,10 @@ import { Mutation, Textarea } from "@/components/ui";
 import { Refresh } from "@/components/refresh";
 export default async function Conversation({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ before?: string }>;
 }) {
   const { user, db } = await authenticated();
   const { id } = await params;
@@ -21,13 +23,32 @@ export default async function Conversation({
     .maybeSingle();
   fail(error);
   if (!c) notFound();
-  const { data: messages, error: e } = await db
-    .from("messages")
-    .select("*")
-    .eq("conversation_id", id)
-    .order("created_at")
-    .order("id");
+  const { before } = await searchParams;
+  let query = db.from("messages").select("*").eq("conversation_id", id);
+  if (before) {
+    if (!uuid.safeParse(before).success) notFound();
+    // Resolve the cursor through the same conversation and participant RLS.
+    // Never accept a client-supplied timestamp or another conversation's row.
+    const { data: cursor, error: cursorError } = await db
+      .from("messages")
+      .select("id,created_at")
+      .eq("conversation_id", id)
+      .eq("id", before)
+      .maybeSingle();
+    fail(cursorError);
+    if (!cursor) notFound();
+    query = query.or(
+      `created_at.lt.${cursor.created_at},and(created_at.eq.${cursor.created_at},id.lt.${cursor.id})`,
+    );
+  }
+  const pageSize = 25;
+  const { data: messages, error: e } = await query
+    .order("created_at", { ascending: false })
+    .order("id", { ascending: false })
+    .limit(pageSize + 1);
   fail(e);
+  const page = (messages ?? []).slice(0, pageSize);
+  const hasOlder = (messages?.length ?? 0) > pageSize;
   const { data: name } = await db.rpc("seller_name", {
     p_id: user.id === c.buyer_id ? c.seller_id : c.buyer_id,
   });
@@ -42,7 +63,23 @@ export default async function Conversation({
         <Refresh />
         <Mutation command="read-messages" id={id} label="Mark as read" />
       </div>
-      {messages?.map((m) => (
+      <p className="meta">
+        {before ? "Earlier messages" : "Latest messages"} / {page.length} shown
+      </p>
+      {(before || hasOlder) && (
+        <nav
+          className="pagination message-history"
+          aria-label="Message history"
+        >
+          {hasOlder && (
+            <Link href={`/messages/${id}?before=${page.at(-1)!.id}`}>
+              Older messages
+            </Link>
+          )}
+          {before && <Link href={`/messages/${id}`}>Latest messages</Link>}
+        </nav>
+      )}
+      {page.toReversed().map((m) => (
         <article
           className={`message ${m.sender_id === user.id ? "own" : ""}`}
           key={m.id}
