@@ -1,6 +1,11 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import {
+  commandRequest,
+  COMMAND_SIZE_ERROR,
+  PayloadTooLargeError,
+} from "@/lib/upload-policy";
 export function ActionForm({
   command,
   fields = {},
@@ -29,10 +34,15 @@ export function ActionForm({
         setError("");
         setMessage("");
         try {
-          const response = await fetch("/api/command", {
-            method: "POST",
-            body: new FormData(form),
-          });
+          const request = await commandRequest(
+            new URL("/api/command", window.location.href).href,
+            new FormData(form),
+          );
+          const response = await fetch(request);
+          if (response.status === 413) {
+            setError(COMMAND_SIZE_ERROR);
+            return;
+          }
           const result = await response.json();
           if (!response.ok) {
             setError(result.error || "Unable to complete request.");
@@ -42,8 +52,12 @@ export function ActionForm({
           if (reset) form.reset();
           if (result.redirect) router.push(result.redirect);
           router.refresh();
-        } catch {
-          setError("Connection failed. Check your connection and try again.");
+        } catch (error) {
+          setError(
+            error instanceof PayloadTooLargeError
+              ? error.message
+              : "Connection failed. Check your connection and try again.",
+          );
         } finally {
           setPending(false);
         }

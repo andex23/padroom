@@ -65,6 +65,7 @@ Only database operators can provision membership. Do not expose an admin bootstr
 - All application tables have RLS; direct table mutations are revoked for anonymous and authenticated roles. Writes go through constrained RPCs that use `auth.uid()` and check active accounts, ownership, participant roles, valid transitions and per-user hourly limits.
 - Anonymous queries return only active inventory from unsuspended sellers. Profiles are private except for a constrained display-name RPC. Favorites belong to their user. Conversations, messages and requests belong to their participants.
 - Private photo storage permits owner uploads only to draft listing paths. The application checks file size/type, actually decodes content with Sharp, limits pixels, resizes to 1600px and converts to JPEG without metadata. The bucket also limits MIME type and size. Photos have RLS and short-lived signed URLs (60 seconds); already issued links can remain usable until expiry after a listing is hidden. Refresh a page to renew expired photo URLs.
+- Source photos are limited to 4 MB (4,000,000 bytes). Browser and server cap the entire multipart command at 4.25 MB (4,250,000 bytes), including all fields and filenames, leaving headroom below Vercel's function body limit. The browser measures the actual encoding before sending; oversized requests show a retryable size error. See the [upload compatibility verification](docs/UPLOAD_COMPATIBILITY.md).
 - Purchase/trade transitions lock affected inventory in UUID order and reserve both trade items. Exactly one conflicting request may be accepted. Direct API calls cannot override ownership, approve inventory, alter private records or grant admin access. Accepted arrangements must be resolved before the seller edits/archives their items.
 - Server mutations check browser Origin and validate input. Listing text and messages render as escaped React text. There are no service-role keys in application code.
 - Auth endpoints use Supabase rate limiting. Database RPC limits cover listing writes (30/hour), messages (60/hour), requests (20/hour), reports (10/hour) and saves (120/hour). These are fixed pilot limits, shared across browser/direct RPC access.
@@ -89,7 +90,9 @@ Playwright tests the approved homepage on desktop/mobile and a genuine multi-acc
 PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:e2e
 ```
 
-Temporary test screenshots and traces are excluded from Git. Approved before/after UI captures are retained in `docs/screenshots`; reproduce the two current homepage captures against the running app with `npm run screenshots:home`. See `docs/HOME_UI_ACCEPTANCE.md` for the comparison against the approved contract. The production default never contains a synthetic catalog. See `docs/IMPLEMENTATION.md` for the milestone design and `docs/VALIDATION.md` for recorded results and remaining launch work.
+Temporary test screenshots and traces are excluded from Git. Approved before/after UI captures and selected independent verification captures are retained in `docs/screenshots`; reproduce the two current homepage captures against the running app with `npm run screenshots:home`. See `docs/HOME_UI_ACCEPTANCE.md` for the comparison against the approved contract. The production default never contains a synthetic catalog. See `docs/IMPLEMENTATION.md` for the milestone design and `docs/VALIDATION.md` for recorded results and remaining launch work.
+
+The separate [fresh-checkout cloud verification](docs/CLOUD_VERIFICATION.md) records independently rerun checks, targeted fixes, retained desktop/mobile evidence and outstanding hosted launch configuration.
 
 ## Specifications
 

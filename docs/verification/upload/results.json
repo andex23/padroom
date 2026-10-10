@@ -1,0 +1,55 @@
+{
+  "verified_on": "2026-10-09",
+  "preserved_parent_commit": "73e446a431a6e0cddc25b2c7f88ddf448f50bb43",
+  "environment": "same isolated cloud checkout; real local Supabase and Chromium",
+  "source_photo_limit_bytes": 4000000,
+  "complete_command_limit_bytes": 4250000,
+  "provider_documented_limit_mb": 4.5,
+  "provider_headroom_decimal_bytes": 250000,
+  "install": "previous frozen install reused; lock unchanged",
+  "lint": "passed",
+  "typecheck": "passed",
+  "unit": {
+    "passed": 41,
+    "failed": 0,
+    "skipped": 0
+  },
+  "database": {
+    "passed_assertions": 74,
+    "failed_assertions": 0,
+    "skipped_assertions": 0
+  },
+  "browser": {
+    "passed": 24,
+    "failed": 0,
+    "skipped": 0,
+    "flaky": 0,
+    "retries": 0,
+    "start_time_utc": "2026-10-09T20:59:53.860Z",
+    "duration_ms": 198426.826
+  },
+  "production_build": "passed with local configuration",
+  "cleanup": "zero fixture records and storage objects; 11 application tables have RLS",
+  "historical_pre_fix_regressions": {
+    "image_failed": 1,
+    "request_failed": 1
+  },
+  "initial_expanded_browser_run": {
+    "passed": 21,
+    "failed": 3,
+    "skipped": 0,
+    "reasons": [
+      "two binary post-data instrumentation failures",
+      "one mobile navigation synchronization failure"
+    ]
+  },
+  "blocked_checks": [
+    "authorized hosted preview with maximum-size upload",
+    "hosted Supabase migration/RLS",
+    "production auth redirects and SMTP confirmation/recovery",
+    "genuine administrator",
+    "public deployment"
+  ],
+  "schema_and_lock_unchanged": true,
+  "external_changes_performed": false
+}

@@ -19,8 +19,11 @@ Explore uses the existing database-backed feed at `/explore` and focuses search.
 
 - [Before: 390px](screenshots/home-before-390.png) / [Before: 1280px](screenshots/home-before-1280.png)
 - [Approved implementation: 390×844](screenshots/home-390.png) / [Approved implementation: 1280×800](screenshots/home-1280.png)
+- [Independent fresh-checkout verification: 390×844](screenshots/verification/home-390.png) / [1280×800](screenshots/verification/home-1280.png)
 
 These are captures of the actual app. The database is empty after test-fixture cleanup, so they show the required honest empty state. No sample console images or fabricated catalog records are included.
+
+The independent review preserved the approved structure and original images. Its [verification report](CLOUD_VERIFICATION.md) links genuine local seller/buyer/moderator flows, distinguishes temporary test inventory from the empty production default and records remaining launch blockers.
 
 Run the app, then use `npm run screenshots:home` to reproduce the two after screenshots. On this cloud environment the script uses installed Chromium; elsewhere install Playwright Chromium or set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`. Screenshots are anonymous and contain no credentials.
 

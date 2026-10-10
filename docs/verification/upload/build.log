@@ -1,0 +1,47 @@
+
+> padroom@0.1.0 build
+> next build
+
+▲ Next.js 16.4.0 (Turbopack)
+- Environments: .env.local
+✓ Running next.config.ts took 40ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 992ms
+  Running TypeScript ...
+  Finished TypeScript in 3.2s ...
+  Collecting page data using 4 workers ...
+  Generating static pages using 4 workers (0/3) ...
+✓ Generating static pages using 4 workers (3/3) in 256ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ƒ /
+├ ƒ /_not-found
+├ ƒ /about
+├ ƒ /account
+├ ƒ /admin
+├ ƒ /api/command
+├ ƒ /auth/callback
+├ ƒ /explore
+├ ƒ /forgot-password
+├ ƒ /how-it-works
+├ ƒ /listings/[id]
+├ ƒ /messages
+├ ƒ /messages/[id]
+├ ƒ /my-listings
+├ ƒ /offers
+├ ƒ /privacy
+├ ƒ /reset-password
+├ ƒ /safety
+├ ƒ /saved
+├ ƒ /sell/[id]/edit
+├ ƒ /sell/new
+├ ƒ /sign-in
+├ ƒ /sign-up
+└ ƒ /terms
+
+
+ƒ Proxy (Middleware)
+
+ƒ  (Dynamic)  server-rendered on demand

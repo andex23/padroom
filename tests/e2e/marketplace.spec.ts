@@ -66,6 +66,13 @@ test("real seller → moderation → buyer workflow", async ({
       .click();
     await expect(page).toHaveURL(/\/account$/);
   }
+  async function capture(page: Page, step: string) {
+    await page.evaluate(() => document.fonts.ready);
+    await page.screenshot({
+      path: `test-results/verification-${test.info().project.name}-${step}.png`,
+      fullPage: true,
+    });
+  }
   try {
     await signup(seller, emails[0], "Local browser seller");
     await signup(buyer, emails[1], "Local browser buyer");
@@ -77,6 +84,7 @@ test("real seller → moderation → buyer workflow", async ({
     await expect(
       seller.getByRole("heading", { name: "Your account" }),
     ).toBeVisible();
+    await capture(seller, "01-account");
     await seller.goto("/sell/new");
     const title = `Local workflow ${token.slice(0, 8)} console`;
     await seller.getByLabel("Title", { exact: true }).fill(title);
@@ -117,6 +125,9 @@ test("real seller → moderation → buyer workflow", async ({
       seller.getByRole("status").filter({ hasText: "Photo added." }),
     ).toBeVisible();
     await expect(seller.getByRole("img")).toBeVisible();
+    const thumbnail = await seller.locator(".photos-edit img").boundingBox();
+    expect(thumbnail!.height).toBeCloseTo(thumbnail!.width, 0);
+    await capture(seller, "02-listing-photo");
     await seller.getByRole("button", { name: "Submit for review" }).click();
     await expect(seller).toHaveURL(/\/my-listings$/);
     await expect(
@@ -156,12 +167,18 @@ test("real seller → moderation → buyer workflow", async ({
     expect(composition.ratio).toBeCloseTo(4 / 5, 2);
     expect(composition.top).toBeLessThan(360);
     expect(composition.overflow).toBe(false);
+    await capture(buyer, "03-inventory");
     await buyer
       .getByRole("article")
       .filter({ has: buyer.getByRole("heading", { name: title, exact: true }) })
       .getByRole("link")
       .click();
+    await expect(buyer).toHaveURL(new RegExp(`/listings/${id}$`));
     await expect(buyer.getByRole("heading", { name: title })).toBeVisible();
+    await expect(
+      buyer.getByRole("button", { name: "Save equipment" }),
+    ).toBeVisible();
+    await capture(buyer, "04-listing-detail");
     await buyer.getByRole("button", { name: "Save equipment" }).click();
     await expect(
       buyer.getByRole("button", { name: "Remove from saved" }),
@@ -194,6 +211,7 @@ test("real seller → moderation → buyer workflow", async ({
     await expect(
       buyer.getByText("Yes. Let’s arrange an inspection.", { exact: true }),
     ).toBeVisible();
+    await capture(buyer, "05-conversation");
     // Exercise real persisted history, not a fake catalog or mocked response.
     const conversationId = new URL(conversation).pathname.split("/")[2];
     const history = (n: number) =>
@@ -269,6 +287,7 @@ test("real seller → moderation → buyer workflow", async ({
     await expect(
       seller.getByText("Received · completed", { exact: false }),
     ).toBeVisible();
+    await capture(seller, "06-purchase-completed");
     await buyer.goto("/");
     await buyer.getByRole("searchbox").fill(title);
     await buyer.getByRole("button", { name: "Search", exact: true }).click();
@@ -283,6 +302,10 @@ test("real seller → moderation → buyer workflow", async ({
     await expect(seller).toHaveURL(/\/$/);
     await seller.goto("/saved");
     await expect(seller).toHaveURL(/sign-in/);
+    // URL parsers remove these controls, which formerly enabled an external redirect.
+    await seller.goto(
+      `/sign-in?next=${encodeURIComponent("/\t/evil.example")}`,
+    );
     await seller.getByLabel("Email", { exact: true }).fill(emails[0]);
     await seller.getByLabel("Password", { exact: true }).fill(password);
     await seller.getByRole("button", { name: "Sign in", exact: true }).click();
@@ -333,6 +356,24 @@ test("real seller → moderation → buyer workflow", async ({
       .fill(password);
     await seller.getByRole("button", { name: "Update password" }).click();
     await expect(seller).toHaveURL(/\/account$/);
+    await expect(
+      seller.getByRole("heading", { name: "Your account" }),
+    ).toBeVisible();
+    await seller
+      .locator("main")
+      .getByRole("button", { name: "Sign out" })
+      .click();
+    await expect(seller).toHaveURL(/\/$/);
+    await seller.goto("/sign-in");
+    await seller.getByLabel("Email", { exact: true }).fill(emails[0]);
+    await seller.getByLabel("Password", { exact: true }).fill(password);
+    await seller.getByRole("button", { name: "Sign in", exact: true }).click();
+    await expect(seller).toHaveURL(/\/$/);
+    await seller.goto("/account");
+    await expect(
+      seller.getByRole("heading", { name: "Your account" }),
+    ).toBeVisible();
+    await capture(seller, "07-recovery-completed");
     await seller.request.delete(`http://127.0.0.1:54324/api/v1/messages`, {
       data: { IDs: [mailId] },
     });

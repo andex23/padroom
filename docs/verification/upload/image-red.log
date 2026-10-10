@@ -1,0 +1,34 @@
+
+> padroom@0.1.0 test
+> vitest run tests/image.test.ts
+
+
+ RUN  v5.0.3 /workspace/padroom
+
+ ❯ tests/image.test.ts (5 tests | 1 failed) 573ms
+   ❯ real upload content validation (5)
+     × rejects oversized files before decoding 12ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/image.test.ts > real upload content validation > rejects oversized files before decoding
+AssertionError: expected [Function] to throw error including 'up to 4 MB' but got 'Input buffer contains unsupported ima…'
+
+Expected: "up to 4 MB"
+Received: "Input buffer contains unsupported image format"
+
+ ❯ tests/image.test.ts:44:6
+     42|     await expect(
+     43|       normalizePhoto(new Uint8Array(4_000_001), "image/jpeg"),
+     44|     ).rejects.toThrow("up to 4 MB");
+       |      ^
+     45|   });
+     46| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 passed (5)
+   Start at  20:52:31
+   Duration  809ms (tests 84%, transform 8%, import 8%, worker 1%)

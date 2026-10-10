@@ -1,0 +1,5 @@
+
+> padroom@0.1.0 setup:local
+> bash scripts/install-supabase.sh
+
+2.78.1

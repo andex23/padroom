@@ -60,7 +60,8 @@ export function money(kobo: number) {
 export function safeNext(value: string | null) {
   return value?.startsWith("/") &&
     !value.startsWith("//") &&
-    !value.includes("\\")
+    !value.includes("\\") &&
+    !/[\t\n\r]/.test(value)
     ? value
     : "/";
 }
